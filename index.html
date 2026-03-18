@@ -1,0 +1,927 @@
+<!--
+  MELOGINE LANDING PAGE
+  Deploy: Push to GitHub, connect repo to Netlify (netlify.com), set custom domain in Netlify settings.
+  DNS: In GoDaddy, add a CNAME record pointing www to your Netlify subdomain, and an A record for @ to Netlify's load balancer IP.
+  Mailchimp: Replace the form action URL with your Mailchimp embedded form action.
+  Screenshots: Replace placeholder divs with <img> tags pointing to your screenshot files.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Melogine | Theory for producers who learn by doing</title>
+  <meta
+    name="description"
+    content="Melogine is an iOS music theory app for bedroom producers, teaching theory through a piano roll the way you already think about music."
+  >
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
+
+    :root {
+      --bg: #1C1A17;
+      --surface: #2A2723;
+      --elevated: #333028;
+      --border: #3D3A35;
+      --text-primary: #F5F0E8;
+      --text-secondary: #8A8480;
+      --accent: #E8A020;
+      --bg-alt: #161412;
+      --dark-text: #1C1A17;
+      --container: 1160px;
+      --radius: 16px;
+      --nav-height: 88px;
+      --shadow-soft: 0 18px 50px rgba(0, 0, 0, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      background: none;
+      cursor: pointer;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    .sr-only {
+      border: 0;
+      clip: rect(0, 0, 0, 0);
+      height: 1px;
+      margin: -1px;
+      overflow: hidden;
+      padding: 0;
+      position: absolute;
+      white-space: nowrap;
+      width: 1px;
+    }
+
+    .container {
+      width: min(100% - 48px, var(--container));
+      margin: 0 auto;
+    }
+
+    .section {
+      padding: 120px 0;
+    }
+
+    .section-alt {
+      background: var(--bg-alt);
+    }
+
+    .section-surface {
+      background: var(--surface);
+    }
+
+    .eyebrow {
+      display: inline-block;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+    }
+
+    .eyebrow-centered {
+      display: block;
+      text-align: center;
+    }
+
+    .section-title {
+      font-size: 40px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+    }
+
+    .section-body {
+      color: var(--text-secondary);
+      font-size: 17px;
+      line-height: 1.7;
+      margin-top: 20px;
+    }
+
+    .button {
+      align-items: center;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      display: inline-flex;
+      font-size: 15px;
+      font-weight: 600;
+      height: 48px;
+      justify-content: center;
+      padding: 0 24px;
+      transition: transform 180ms ease, border-color 180ms ease, background-color 180ms ease, color 180ms ease;
+      white-space: nowrap;
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+    }
+
+    .button-primary {
+      background: var(--accent);
+      color: var(--dark-text);
+    }
+
+    .button-secondary {
+      background: transparent;
+      border-color: var(--border);
+      color: var(--text-primary);
+    }
+
+    .site-nav {
+      background: rgba(28, 26, 23, 0.95);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(61, 58, 53, 0.7);
+      left: 0;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 20;
+    }
+
+    .site-nav__inner {
+      align-items: center;
+      display: flex;
+      justify-content: space-between;
+      min-height: var(--nav-height);
+    }
+
+    .wordmark {
+      color: var(--accent);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .hero {
+      align-items: center;
+      display: flex;
+      min-height: 100vh;
+      padding: calc(var(--nav-height) + 40px) 0 72px;
+      text-align: center;
+    }
+
+    .hero__content {
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin: 0 auto;
+      max-width: 900px;
+    }
+
+    .hero__title {
+      font-size: 80px;
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      line-height: 1.1;
+      max-width: 860px;
+      white-space: pre-line;
+    }
+
+    .hero__subtitle {
+      color: var(--text-secondary);
+      font-size: 20px;
+      line-height: 1.6;
+      margin-top: 24px;
+      max-width: 540px;
+    }
+
+    .hero__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 40px;
+    }
+
+    .hero__footnote {
+      color: var(--text-secondary);
+      font-size: 13px;
+      margin-top: 18px;
+      text-align: center;
+    }
+
+    .mockup {
+      align-items: center;
+      aspect-ratio: 9 / 19.5;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 32px;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      justify-content: center;
+      margin: 48px auto 0;
+      max-width: 100%;
+      position: relative;
+      width: 280px;
+    }
+
+    .mockup::before {
+      background: var(--border);
+      border-radius: 999px;
+      content: "";
+      height: 8px;
+      left: 50%;
+      opacity: 0.9;
+      position: absolute;
+      top: 18px;
+      transform: translateX(-50%);
+      width: 96px;
+    }
+
+    .mockup span,
+    .radar-placeholder span {
+      color: var(--text-secondary);
+      font-size: 14px;
+      letter-spacing: 0.02em;
+    }
+
+    .problem {
+      text-align: center;
+    }
+
+    .problem__inner {
+      margin: 0 auto;
+      max-width: 800px;
+    }
+
+    .problem__quote {
+      font-size: 52px;
+      font-style: italic;
+      letter-spacing: -0.04em;
+      line-height: 1.3;
+      white-space: pre-line;
+    }
+
+    .problem__body {
+      color: var(--text-secondary);
+      font-size: 18px;
+      line-height: 1.7;
+      margin: 32px auto 0;
+      max-width: 600px;
+    }
+
+    .feature {
+      align-items: center;
+      display: grid;
+      gap: 80px;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+
+    .feature__copy {
+      max-width: 520px;
+    }
+
+    .feature__media {
+      display: flex;
+      justify-content: center;
+    }
+
+    .feature-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 32px;
+    }
+
+    .feature-tag {
+      align-items: center;
+      background: var(--elevated);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      color: var(--text-primary);
+      display: inline-flex;
+      font-size: 12px;
+      padding: 6px 12px;
+    }
+
+    .emotion {
+      text-align: center;
+    }
+
+    .emotion__inner {
+      margin: 0 auto;
+      max-width: 700px;
+    }
+
+    .emotion__title {
+      font-size: 52px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1.2;
+      text-align: center;
+      white-space: pre-line;
+    }
+
+    .emotion__body {
+      color: var(--text-secondary);
+      font-size: 18px;
+      line-height: 1.7;
+      margin: 24px auto 0;
+      max-width: 560px;
+    }
+
+    .radar-placeholder {
+      align-items: center;
+      background: var(--elevated);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      display: flex;
+      height: 280px;
+      justify-content: center;
+      margin: 48px auto 0;
+      width: 280px;
+    }
+
+    .pricing {
+      text-align: center;
+    }
+
+    .pricing__subtitle {
+      color: var(--text-secondary);
+      font-size: 18px;
+      margin-top: 12px;
+    }
+
+    .pricing-grid {
+      display: grid;
+      gap: 24px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-top: 64px;
+      text-align: left;
+    }
+
+    .pricing-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px 32px;
+      position: relative;
+    }
+
+    .pricing-card--highlight {
+      border-color: var(--accent);
+    }
+
+    .pricing-card--lifetime {
+      grid-column: 1 / -1;
+      max-width: 480px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .pricing-card--lifetime .pricing-features {
+      display: inline-block;
+      text-align: left;
+    }
+
+    .pricing-badge {
+      background: var(--accent);
+      border-radius: 20px;
+      color: var(--dark-text);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 4px 10px;
+      position: absolute;
+      right: 24px;
+      text-transform: uppercase;
+      top: 24px;
+    }
+
+    .pricing-label {
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .pricing-price {
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin-top: 16px;
+    }
+
+    .pricing-subcopy {
+      color: var(--text-secondary);
+      font-size: 15px;
+      margin-top: 8px;
+    }
+
+    .pricing-divider {
+      background: var(--border);
+      height: 1px;
+      margin: 28px 0 24px;
+      width: 100%;
+    }
+
+    .pricing-features {
+      list-style: none;
+    }
+
+    .pricing-features li {
+      color: var(--text-primary);
+      font-size: 14px;
+      line-height: 2;
+      padding-left: 16px;
+      position: relative;
+    }
+
+    .pricing-features li::before {
+      color: var(--accent);
+      content: "·";
+      font-size: 22px;
+      left: 0;
+      line-height: 1;
+      position: absolute;
+      top: 4px;
+    }
+
+    .pricing-footnote {
+      color: var(--text-secondary);
+      font-size: 13px;
+      line-height: 1.6;
+      margin-top: 32px;
+      max-width: 900px;
+      text-align: center;
+    }
+
+    .cta {
+      text-align: center;
+    }
+
+    .cta__title {
+      font-size: 52px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1.2;
+      white-space: pre-line;
+    }
+
+    .cta-form {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin: 48px auto 0;
+      max-width: 620px;
+    }
+
+    .cta-input {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-primary);
+      flex: 1 1 320px;
+      height: 52px;
+      min-width: 0;
+      padding: 0 20px;
+    }
+
+    .cta-input::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .cta-submit {
+      background: var(--accent);
+      border-radius: 8px;
+      color: var(--dark-text);
+      flex: 0 0 auto;
+      font-size: 15px;
+      font-weight: 600;
+      height: 52px;
+      padding: 0 28px;
+    }
+
+    .cta-note {
+      color: var(--text-secondary);
+      font-size: 13px;
+      margin-top: 16px;
+    }
+
+    .cta-store {
+      margin-top: 24px;
+    }
+
+    .site-footer {
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+    }
+
+    .site-footer__inner {
+      align-items: center;
+      display: flex;
+      gap: 20px;
+      justify-content: space-between;
+    }
+
+    .site-footer__copy,
+    .site-footer__links a {
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+
+    .site-footer__links {
+      display: flex;
+      gap: 24px;
+    }
+
+    @media (max-width: 980px) {
+      .hero__title {
+        font-size: 64px;
+      }
+
+      .problem__quote,
+      .emotion__title,
+      .cta__title {
+        font-size: 44px;
+      }
+
+      .feature {
+        gap: 48px;
+      }
+
+      .pricing-grid {
+        grid-template-columns: 1fr;
+        max-width: 720px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+
+    @media (max-width: 767px) {
+      .container {
+        width: min(100% - 32px, var(--container));
+      }
+
+      .section {
+        padding: 88px 0;
+      }
+
+      .nav-actions {
+        display: none;
+      }
+
+      .hero {
+        min-height: 100vh;
+        padding: calc(var(--nav-height) + 24px) 0 56px;
+      }
+
+      .hero__title {
+        font-size: 42px;
+      }
+
+      .hero__subtitle {
+        font-size: 18px;
+      }
+
+      .hero__actions {
+        align-items: stretch;
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .hero__actions .button {
+        width: 100%;
+      }
+
+      .problem__quote,
+      .emotion__title,
+      .cta__title {
+        font-size: 32px;
+      }
+
+      .problem__body,
+      .emotion__body,
+      .pricing__subtitle {
+        font-size: 17px;
+      }
+
+      .section-title {
+        font-size: 28px;
+      }
+
+      .feature {
+        grid-template-columns: 1fr;
+        gap: 36px;
+      }
+
+      .feature__copy,
+      .feature__media {
+        max-width: none;
+      }
+
+      .feature__media {
+        order: -1;
+      }
+
+      .mockup {
+        width: min(280px, 100%);
+      }
+
+      .radar-placeholder {
+        height: min(280px, calc(100vw - 64px));
+        width: min(280px, calc(100vw - 64px));
+      }
+
+      .cta-form {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .cta-input,
+      .cta-submit,
+      .cta-store .button {
+        width: 100%;
+      }
+
+      .site-footer__inner,
+      .site-footer__links {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-nav">
+    <div class="container site-nav__inner">
+      <a class="wordmark" href="#top">Melogine</a>
+      <div class="nav-actions">
+        <a class="button button-secondary" href="#">Download on the App Store</a>
+        <a class="button button-primary" href="#early-access">Get Early Access</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="container">
+        <div class="hero__content">
+          <h1 class="hero__title">Theory for producers
+who learn by doing.</h1>
+          <p class="hero__subtitle">
+            Melogine teaches music theory through a piano roll — the way you already think about music.
+          </p>
+          <div class="hero__actions">
+            <a class="button button-primary" href="#early-access">Get Early Access</a>
+            <a class="button button-secondary" href="#">Download on the App Store</a>
+          </div>
+          <!-- REPLACE THIS WITH ACTUAL APP SCREENSHOT -->
+          <div class="mockup" aria-label="App screenshot placeholder" role="img">
+            <span>App screenshot</span>
+          </div>
+          <p class="hero__footnote">Available on iOS 18.2 and above</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-alt problem">
+      <div class="container">
+        <div class="problem__inner">
+          <h2 class="problem__quote">You can feel when a chord progression is right.
+You just don't know why yet.</h2>
+          <p class="problem__body">
+            Most music theory resources were built for classically trained musicians. Melogine was built for producers who work in DAWs, think in piano rolls, and learn by experimenting — not reading.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container feature">
+        <div class="feature__media">
+          <!-- REPLACE WITH SANDBOX SCREENSHOT -->
+          <div class="mockup" aria-label="Sandbox screenshot placeholder" role="img">
+            <span>App screenshot</span>
+          </div>
+        </div>
+        <div class="feature__copy">
+          <span class="eyebrow">Sandbox</span>
+          <h2 class="section-title">Build chords by feel.
+Understand them by theory.</h2>
+          <p class="section-body">
+            The Ghost Engine guides you note by note — showing which scale degrees and chord tones fit your progression in real time. No lectures. No staff notation. Just the next right note, when you need it.
+          </p>
+          <div class="feature-tags" aria-label="Sandbox features">
+            <span class="feature-tag">Ghost Engine</span>
+            <span class="feature-tag">Chord Tone Guidance</span>
+            <span class="feature-tag">Emotional Fingerprint</span>
+            <span class="feature-tag">Scale Highlighting</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container feature">
+        <div class="feature__copy">
+          <span class="eyebrow">Fundamentals</span>
+          <h2 class="section-title">Theory that finally makes sense
+in a DAW.</h2>
+          <p class="section-body">
+            Intervals, scales, chord construction — all taught through the piano roll you already know. No treble clef. No sheet music. Just the concepts that make your productions better.
+          </p>
+        </div>
+        <div class="feature__media">
+          <!-- REPLACE WITH FUNDAMENTALS SCREENSHOT -->
+          <div class="mockup" aria-label="Fundamentals screenshot placeholder" role="img">
+            <span>App screenshot</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container feature">
+        <div class="feature__media">
+          <!-- REPLACE WITH CHALLENGES SCREENSHOT -->
+          <div class="mockup" aria-label="Challenges screenshot placeholder" role="img">
+            <span>App screenshot</span>
+          </div>
+        </div>
+        <div class="feature__copy">
+          <span class="eyebrow">Challenges</span>
+          <h2 class="section-title">Test what you know.
+Build what you don't.</h2>
+          <p class="section-body">
+            Ear training, chord recognition, voice leading, modal interchange — progressive challenges that meet you where you are and push you further every session.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-surface emotion">
+      <div class="container">
+        <div class="emotion__inner">
+          <span class="eyebrow eyebrow-centered">Emotional Fingerprint</span>
+          <h2 class="emotion__title">Know the feeling before
+you finish the chord.</h2>
+          <p class="emotion__body">
+            A real-time radar chart maps the emotional character of your progression across eight axes — Joy, Tension, Melancholy, Longing, and more. Watch it shift as you build.
+          </p>
+          <!-- REPLACE WITH RADAR CHART SCREENSHOT -->
+          <div class="radar-placeholder" aria-label="Radar chart placeholder" role="img">
+            <span>Radar chart</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section pricing" id="pricing">
+      <div class="container">
+        <h2 class="section-title">Simple pricing.</h2>
+        <p class="pricing__subtitle">Free to start. Pro when you're ready.</p>
+        <div class="pricing-grid">
+          <article class="pricing-card">
+            <p class="pricing-label">Free</p>
+            <p class="pricing-price">£0</p>
+            <p class="pricing-subcopy">Always</p>
+            <div class="pricing-divider" aria-hidden="true"></div>
+            <ul class="pricing-features">
+              <li>Ghost Engine (15 suggestions/day)</li>
+              <li>Fundamentals</li>
+              <li>Glossary</li>
+              <li>Scale &amp; Chord Challenges</li>
+            </ul>
+          </article>
+
+          <article class="pricing-card">
+            <p class="pricing-label">Pro</p>
+            <p class="pricing-price">£7.99</p>
+            <p class="pricing-subcopy">per month</p>
+            <div class="pricing-divider" aria-hidden="true"></div>
+            <ul class="pricing-features">
+              <li>Everything in Free</li>
+              <li>Unlimited ghost suggestions</li>
+              <li>Chord tone guidance</li>
+              <li>Emotional fingerprint</li>
+              <li>All challenges</li>
+              <li>Save &amp; MIDI export</li>
+            </ul>
+          </article>
+
+          <article class="pricing-card pricing-card--highlight">
+            <span class="pricing-badge">Best Value</span>
+            <p class="pricing-label">Pro</p>
+            <p class="pricing-price">£49.99</p>
+            <p class="pricing-subcopy">per year · save 48%</p>
+            <div class="pricing-divider" aria-hidden="true"></div>
+            <ul class="pricing-features">
+              <li>Everything in Free</li>
+              <li>Unlimited ghost suggestions</li>
+              <li>Chord tone guidance</li>
+              <li>Emotional fingerprint</li>
+              <li>All challenges</li>
+              <li>Save &amp; MIDI export</li>
+            </ul>
+          </article>
+
+          <article class="pricing-card pricing-card--lifetime">
+            <p class="pricing-label">Lifetime</p>
+            <p class="pricing-price">£149</p>
+            <p class="pricing-subcopy">One-time payment</p>
+            <div class="pricing-divider" aria-hidden="true"></div>
+            <ul class="pricing-features">
+              <li>Everything in Pro</li>
+              <li>Unlimited ghost suggestions</li>
+              <li>Chord tone guidance</li>
+              <li>Emotional fingerprint</li>
+              <li>All challenges</li>
+              <li>Save &amp; MIDI export</li>
+              <li>Own it forever — no subscription</li>
+            </ul>
+          </article>
+        </div>
+        <p class="pricing-footnote">
+          Subscriptions auto-renew unless cancelled · Manage in App Store settings
+        </p>
+      </div>
+    </section>
+
+    <section class="section section-alt cta" id="early-access">
+      <div class="container">
+        <h2 class="cta__title">Be the first to know
+when Melogine launches.</h2>
+        <!-- REPLACE ACTION URL WITH MAILCHIMP FORM ACTION -->
+        <form class="cta-form" action="#" method="post">
+          <label class="sr-only" for="email">Email address</label>
+          <input
+            class="cta-input"
+            id="email"
+            name="EMAIL"
+            type="email"
+            placeholder="Enter your email"
+            required
+          >
+          <button class="cta-submit" type="submit">Get Early Access</button>
+        </form>
+        <p class="cta-note">No spam. Just a launch notification when Melogine hits the App Store.</p>
+        <div class="cta-store">
+          <!-- REPLACE WITH APP STORE URL -->
+          <a class="button button-secondary" href="#">Download on the App Store &rarr;</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <p class="site-footer__copy">&copy; 2026 Melogine</p>
+      <div class="site-footer__links">
+        <a href="https://melogine.com/privacy">Privacy Policy</a>
+        <a href="https://melogine.com/terms">Terms of Use</a>
+        <a href="mailto:hello@melogine.com">Contact</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
