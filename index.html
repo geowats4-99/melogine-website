@@ -366,15 +366,86 @@
       max-width: 560px;
     }
 
-    .radar-placeholder {
-      align-items: center;
-      background: var(--elevated);
+    @keyframes fadeSwap {
+      0%, 45% { opacity: 1; }
+      50%, 95% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    .hero-mockup {
+      aspect-ratio: 9 / 19;
+      border: 1px solid var(--border);
+      border-radius: 32px;
+      box-shadow: var(--shadow-soft);
+      margin: 48px auto 0;
+      overflow: hidden;
+      position: relative;
+      width: 280px;
+    }
+
+    .hero-mockup img {
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      transition: opacity 0.8s ease;
+      width: 100%;
+    }
+
+    .hero-mockup img:nth-child(1) {
+      animation: fadeSwap 6s ease-in-out infinite;
+    }
+
+    .hero-mockup img:nth-child(2) {
+      animation: fadeSwap 6s ease-in-out infinite;
+      animation-delay: 3s;
+    }
+
+    .screenshot-pair {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 0;
+    }
+
+    .screenshot-pair img {
+      aspect-ratio: 9 / 19;
+      border: 1px solid var(--border);
+      border-radius: 32px;
+      box-shadow: var(--shadow-soft);
+      flex: 1 1 0;
+      min-width: 0;
+      object-fit: cover;
+    }
+
+    .fundamentals-scroll {
+      -ms-overflow-style: none;
+      display: flex;
+      gap: 0;
+      margin-top: 0;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .fundamentals-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .fundamentals-scroll img {
+      flex: 0 0 200px;
+      height: auto;
+      object-fit: cover;
+      scroll-snap-align: start;
+      width: 200px;
+    }
+
+    .radar-image {
+      aspect-ratio: 1;
       border: 1px solid var(--border);
       border-radius: 16px;
-      display: flex;
-      height: 280px;
-      justify-content: center;
       margin: 48px auto 0;
+      object-fit: cover;
       width: 280px;
     }
 
@@ -663,6 +734,10 @@
         order: -1;
       }
 
+      .screenshot-pair {
+        flex-direction: column;
+      }
+
       .mockup {
         width: min(280px, 100%);
       }
@@ -715,9 +790,9 @@ who learn by doing.</h1>
             <a class="button button-primary" href="#early-access">Get Early Access</a>
             <a class="button button-secondary" href="#">Download on the App Store</a>
           </div>
-          <!-- REPLACE THIS WITH ACTUAL APP SCREENSHOT -->
-          <div class="mockup" aria-label="App screenshot placeholder" role="img">
-            <span>App screenshot</span>
+          <div class="hero-mockup" aria-label="Melogine app screenshots">
+            <img src="screenshots/IMG_4732.PNG" alt="Melogine Sandbox with Ghost Engine">
+            <img src="screenshots/IMG_4731.PNG" alt="Melogine Sandbox piano roll">
           </div>
           <p class="hero__footnote">Available on iOS 18.2 and above</p>
         </div>
@@ -739,9 +814,9 @@ You just don't know why yet.</h2>
     <section class="section">
       <div class="container feature">
         <div class="feature__media">
-          <!-- REPLACE WITH SANDBOX SCREENSHOT -->
-          <div class="mockup" aria-label="Sandbox screenshot placeholder" role="img">
-            <span>App screenshot</span>
+          <div class="screenshot-pair">
+            <img src="screenshots/IMG_4732.PNG" alt="Melogine Sandbox with Ghost Engine">
+            <img src="screenshots/IMG_4731.PNG" alt="Melogine Sandbox piano roll">
           </div>
         </div>
         <div class="feature__copy">
@@ -772,9 +847,11 @@ in a DAW.</h2>
           </p>
         </div>
         <div class="feature__media">
-          <!-- REPLACE WITH FUNDAMENTALS SCREENSHOT -->
-          <div class="mockup" aria-label="Fundamentals screenshot placeholder" role="img">
-            <span>App screenshot</span>
+          <div class="fundamentals-scroll">
+            <img src="screenshots/IMG_4730.PNG" alt="Melogine Fundamentals">
+            <img src="screenshots/IMG_4725.PNG" alt="Melogine Fundamentals intervals">
+            <img src="screenshots/IMG_4726.PNG" alt="Melogine Fundamentals scales">
+            <img src="screenshots/IMG_4728.PNG" alt="Melogine Fundamentals chord construction">
           </div>
         </div>
       </div>
@@ -783,9 +860,9 @@ in a DAW.</h2>
     <section class="section">
       <div class="container feature">
         <div class="feature__media">
-          <!-- REPLACE WITH CHALLENGES SCREENSHOT -->
-          <div class="mockup" aria-label="Challenges screenshot placeholder" role="img">
-            <span>App screenshot</span>
+          <div class="screenshot-pair">
+            <img src="screenshots/IMG_4742.PNG" alt="Melogine Challenges">
+            <img src="screenshots/IMG_challenges_correct.PNG" alt="Melogine Challenges correct answer">
           </div>
         </div>
         <div class="feature__copy">
@@ -808,10 +885,7 @@ you finish the chord.</h2>
           <p class="emotion__body">
             A real-time radar chart maps the emotional character of your progression across eight axes — Joy, Tension, Melancholy, Longing, and more. Watch it shift as you build.
           </p>
-          <!-- REPLACE WITH RADAR CHART SCREENSHOT -->
-          <div class="radar-placeholder" aria-label="Radar chart placeholder" role="img">
-            <span>Radar chart</span>
-          </div>
+          <img class="radar-image" src="screenshots/IMG_4755.PNG" alt="Emotional Fingerprint radar chart">
         </div>
       </div>
     </section>
