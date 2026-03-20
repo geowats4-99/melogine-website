@@ -218,69 +218,59 @@
       z-index: 0;
     }
 
-    .hero-key-hud {
-      background: #2A2723;
-      border: 1px solid #3D3A35;
-      border-radius: 12px;
+    .hero-key-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
       left: 32px;
-      padding: 12px 16px;
-      pointer-events: none;
+      list-style: none;
+      margin: 0;
+      padding: 0;
       position: absolute;
-      top: 32px;
-      z-index: 1;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 2;
     }
 
-    .hero-key-hud__keywrap {
-      margin-bottom: 10px;
-      min-height: 1.25em;
-      position: relative;
-    }
-
-    .hero-key-hud__key {
+    .hero-key-list__btn {
+      background: none;
+      border: none;
       color: #f5f0e8;
+      cursor: pointer;
+      display: block;
       font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
       font-size: 13px;
-      font-weight: 600;
-      left: 0;
-      line-height: 1.25;
-      opacity: 0;
-      position: absolute;
-      top: 0;
-      transition: opacity 0.3s ease;
+      font-weight: 500;
+      line-height: 1.2;
+      opacity: 0.5;
+      padding: 0;
+      text-align: left;
+      transition: color 0.2s ease, opacity 0.2s ease, font-weight 0.2s ease;
       white-space: nowrap;
     }
 
-    .hero-key-hud__key.is-visible {
+    .hero-key-list__btn:hover {
+      opacity: 0.8;
+    }
+
+    .hero-key-list__btn--active {
+      color: #e8a020;
+      font-weight: 700;
       opacity: 1;
     }
 
-    .hero-key-hud__degrees {
-      display: flex;
-      flex-wrap: nowrap;
-      gap: 4px;
+    .hero-key-list__btn--active:hover {
+      opacity: 1;
     }
 
-    .hero-key-hud__pill {
-      align-items: center;
-      border-radius: 4px;
-      color: #1c1a17;
-      display: inline-flex;
-      flex-shrink: 0;
-      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-      font-size: 10px;
-      font-weight: 600;
-      height: 20px;
-      justify-content: center;
-      width: 24px;
+    .hero-key-list__btn:focus {
+      outline: none;
     }
 
-    .hero-key-hud__pill--i { background: #ff2d2d; }
-    .hero-key-hud__pill--ii { background: #ff7a1a; }
-    .hero-key-hud__pill--iii { background: #ffe000; }
-    .hero-key-hud__pill--iv { background: #00f060; }
-    .hero-key-hud__pill--v { background: #00cfff; }
-    .hero-key-hud__pill--vi { background: #6060ff; }
-    .hero-key-hud__pill--vii { background: #cc40ff; }
+    .hero-key-list__btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
 
     .hero__foreground {
       position: relative;
@@ -876,21 +866,18 @@
   <main id="top">
     <section class="hero">
       <canvas id="heroWaveCanvas" class="hero-wave-canvas" aria-hidden="true"></canvas>
-      <div class="hero-key-hud" id="heroKeyHud" role="region" aria-label="Key and scale degrees">
-        <div class="hero-key-hud__keywrap">
-          <span class="hero-key-hud__key is-visible" id="heroKeyA">C Major</span>
-          <span class="hero-key-hud__key" id="heroKeyB" aria-hidden="true"></span>
-        </div>
-        <div class="hero-key-hud__degrees" aria-hidden="true">
-          <span class="hero-key-hud__pill hero-key-hud__pill--i">I</span>
-          <span class="hero-key-hud__pill hero-key-hud__pill--ii">ii</span>
-          <span class="hero-key-hud__pill hero-key-hud__pill--iii">iii</span>
-          <span class="hero-key-hud__pill hero-key-hud__pill--iv">IV</span>
-          <span class="hero-key-hud__pill hero-key-hud__pill--v">V</span>
-          <span class="hero-key-hud__pill hero-key-hud__pill--vi">vi</span>
-          <span class="hero-key-hud__pill hero-key-hud__pill--vii">vii&deg;</span>
-        </div>
-      </div>
+      <ul class="hero-key-list" id="heroKeyList" aria-label="Key">
+        <li><button type="button" class="hero-key-list__btn hero-key-list__btn--active" data-key-index="0" aria-current="true">C Major</button></li>
+        <li><button type="button" class="hero-key-list__btn" data-key-index="1">A Minor</button></li>
+        <li><button type="button" class="hero-key-list__btn" data-key-index="2">F Major</button></li>
+        <li><button type="button" class="hero-key-list__btn" data-key-index="3">G Major</button></li>
+        <li><button type="button" class="hero-key-list__btn" data-key-index="4">D Minor</button></li>
+        <li><button type="button" class="hero-key-list__btn" data-key-index="5">Bb Major</button></li>
+        <li><button type="button" class="hero-key-list__btn" data-key-index="6">E Minor</button></li>
+        <li><button type="button" class="hero-key-list__btn" data-key-index="7">D Major</button></li>
+        <li><button type="button" class="hero-key-list__btn" data-key-index="8">B Minor</button></li>
+        <li><button type="button" class="hero-key-list__btn" data-key-index="9">G Minor</button></li>
+      </ul>
       <div class="hero__foreground">
         <div class="container">
           <div class="hero__content">
@@ -1117,8 +1104,7 @@ when Melogine launches.</h2>
   <script>
     (function () {
       var canvas = document.getElementById('heroWaveCanvas');
-      var heroKeyA = document.getElementById('heroKeyA');
-      var heroKeyB = document.getElementById('heroKeyB');
+      var keyList = document.getElementById('heroKeyList');
       var hero = document.querySelector('.hero');
       if (!canvas || !hero || !canvas.getContext) return;
 
@@ -1140,7 +1126,10 @@ when Melogine launches.</h2>
         'G Major',
         'D Minor',
         'Bb Major',
-        'E Minor'
+        'E Minor',
+        'D Major',
+        'B Minor',
+        'G Minor'
       ];
       var ACCENT = '232, 160, 32';
       var OPACITIES = [0.25, 0.18, 0.22, 0.15, 0.2];
@@ -1148,26 +1137,33 @@ when Melogine launches.</h2>
       var SYNC_AMP = 60;
       var PARTICLE_SPACING = 12;
       var PARTICLE_R = 2;
+      /** Pixel offsets from vertical centre — ~24px apart, span 96px inside ~120px band */
+      var WAVE_Y_OFFSETS = [-48, -24, 0, 24, 48];
 
       var dpr = Math.min(window.devicePixelRatio || 1, 2);
       var logicalW = 0;
       var logicalH = 0;
       var loopAnchor = performance.now();
       var lastCycleIndex = -1;
+      var activeKeyIndex = 0;
 
       var waveDefs = [
-        { amp: 95, freq: 0.018, speed: 0.62, phase: 1.1, baseYNorm: 0.2 },
-        { amp: 52, freq: 0.01, speed: 0.38, phase: 2.4, baseYNorm: 0.34 },
-        { amp: 118, freq: 0.014, speed: 0.71, phase: 0.35, baseYNorm: 0.48 },
-        { amp: 44, freq: 0.008, speed: 0.45, phase: 3.8, baseYNorm: 0.62 },
-        { amp: 76, freq: 0.02, speed: 0.55, phase: 5.2, baseYNorm: 0.76 }
+        { amp: 108, freq: 0.018, speed: 0.62, phase: 1.1 },
+        { amp: 94, freq: 0.01, speed: 0.38, phase: 2.4 },
+        { amp: 120, freq: 0.014, speed: 0.71, phase: 0.35 },
+        { amp: 88, freq: 0.008, speed: 0.45, phase: 3.8 },
+        { amp: 102, freq: 0.02, speed: 0.55, phase: 5.2 }
       ];
 
       var waves = [];
-      function syncTargetNorms() {
-        var c = 0.45;
-        var step = 0.06;
-        return [c - 2 * step, c - step, c, c + step, c + 2 * step];
+
+      function applyWaveVerticalPositions() {
+        var cy = logicalH * 0.5;
+        var i;
+        for (i = 0; i < waves.length; i++) {
+          waves[i].origBaseY = cy + WAVE_Y_OFFSETS[i];
+          waves[i].targetY = cy + WAVE_Y_OFFSETS[i];
+        }
       }
 
       function resize() {
@@ -1180,11 +1176,7 @@ when Melogine launches.</h2>
         canvas.style.width = logicalW + 'px';
         canvas.style.height = logicalH + 'px';
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        var norms = syncTargetNorms();
-        for (var i = 0; i < waves.length; i++) {
-          waves[i].targetY = norms[i] * logicalH;
-          waves[i].origBaseY = waveDefs[i].baseYNorm * logicalH;
-        }
+        applyWaveVerticalPositions();
       }
 
       function initWaves() {
@@ -1221,19 +1213,28 @@ when Melogine launches.</h2>
         return x < 0 ? 0 : x > 1 ? 1 : x;
       }
 
-      var keyVisibleIsA = true;
+      function updateKeyListHighlight() {
+        if (!keyList) return;
+        var buttons = keyList.querySelectorAll('.hero-key-list__btn');
+        var b;
+        var i;
+        for (i = 0; i < buttons.length; i++) {
+          b = buttons[i];
+          if (parseInt(b.getAttribute('data-key-index'), 10) === activeKeyIndex) {
+            b.classList.add('hero-key-list__btn--active');
+            b.setAttribute('aria-current', 'true');
+          } else {
+            b.classList.remove('hero-key-list__btn--active');
+            b.removeAttribute('aria-current');
+          }
+        }
+      }
 
-      function crossfadeKeyName(keyIndex) {
-        if (!heroKeyA || !heroKeyB) return;
-        var text = KEYS[keyIndex % KEYS.length];
-        var showEl = keyVisibleIsA ? heroKeyB : heroKeyA;
-        var hideEl = keyVisibleIsA ? heroKeyA : heroKeyB;
-        showEl.textContent = text;
-        showEl.setAttribute('aria-hidden', 'false');
-        hideEl.setAttribute('aria-hidden', 'true');
-        hideEl.classList.remove('is-visible');
-        showEl.classList.add('is-visible');
-        keyVisibleIsA = !keyVisibleIsA;
+      function triggerResyncNow() {
+        var now = performance.now();
+        loopAnchor = now - CONVERGE_START;
+        var elapsed = now - loopAnchor;
+        lastCycleIndex = Math.floor(elapsed / CYCLE_MS);
       }
 
       function drawFrame(t) {
@@ -1315,7 +1316,8 @@ when Melogine launches.</h2>
         var cycleIndex = Math.floor(elapsed / CYCLE_MS);
         if (cycleIndex !== lastCycleIndex) {
           if (lastCycleIndex >= 0) {
-            crossfadeKeyName(cycleIndex % KEYS.length);
+            activeKeyIndex = (activeKeyIndex + 1) % KEYS.length;
+            updateKeyListHighlight();
           }
           lastCycleIndex = cycleIndex;
         }
@@ -1324,7 +1326,23 @@ when Melogine launches.</h2>
         requestAnimationFrame(frame);
       }
 
+      if (keyList) {
+        keyList.addEventListener('click', function (e) {
+          var btn = e.target.closest('.hero-key-list__btn');
+          if (!btn || !keyList.contains(btn)) return;
+          var idx = parseInt(btn.getAttribute('data-key-index'), 10);
+          if (idx === activeKeyIndex) {
+            triggerResyncNow();
+            return;
+          }
+          activeKeyIndex = idx;
+          updateKeyListHighlight();
+          triggerResyncNow();
+        });
+      }
+
       initWaves();
+      updateKeyListHighlight();
       window.addEventListener('resize', function () {
         resize();
       });
