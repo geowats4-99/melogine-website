@@ -218,18 +218,31 @@
       z-index: 0;
     }
 
+    .hero-key-list-wrap {
+      box-sizing: border-box;
+      height: 100vh;
+      height: 100svh;
+      left: 0;
+      max-height: 100%;
+      padding-left: 32px;
+      pointer-events: none;
+      position: absolute;
+      top: 0;
+      width: 200px;
+      z-index: 2;
+    }
+
     .hero-key-list {
       display: flex;
       flex-direction: column;
       gap: 10px;
-      left: 32px;
       list-style: none;
       margin: 0;
       padding: 0;
-      position: absolute;
+      pointer-events: auto;
+      position: relative;
       top: 50%;
       transform: translateY(-50%);
-      z-index: 2;
     }
 
     .hero-key-list__btn {
@@ -245,7 +258,7 @@
       opacity: 0.5;
       padding: 0;
       text-align: left;
-      transition: color 0.2s ease, opacity 0.2s ease, font-weight 0.2s ease;
+      transition: color 0.5s ease, opacity 0.5s ease, font-weight 0.5s ease;
       white-space: nowrap;
     }
 
@@ -257,6 +270,7 @@
       color: #e8a020;
       font-weight: 700;
       opacity: 1;
+      transition: color 0.2s ease, opacity 0.2s ease, font-weight 0.2s ease;
     }
 
     .hero-key-list__btn--active:hover {
@@ -866,8 +880,9 @@
   <main id="top">
     <section class="hero">
       <canvas id="heroWaveCanvas" class="hero-wave-canvas" aria-hidden="true"></canvas>
+      <div class="hero-key-list-wrap">
       <ul class="hero-key-list" id="heroKeyList" aria-label="Key">
-        <li><button type="button" class="hero-key-list__btn hero-key-list__btn--active" data-key-index="0" aria-current="true">C Major</button></li>
+        <li><button type="button" class="hero-key-list__btn" data-key-index="0">C Major</button></li>
         <li><button type="button" class="hero-key-list__btn" data-key-index="1">A Minor</button></li>
         <li><button type="button" class="hero-key-list__btn" data-key-index="2">F Major</button></li>
         <li><button type="button" class="hero-key-list__btn" data-key-index="3">G Major</button></li>
@@ -878,6 +893,7 @@
         <li><button type="button" class="hero-key-list__btn" data-key-index="8">B Minor</button></li>
         <li><button type="button" class="hero-key-list__btn" data-key-index="9">G Minor</button></li>
       </ul>
+      </div>
       <div class="hero__foreground">
         <div class="container">
           <div class="hero__content">
@@ -1109,16 +1125,15 @@ when Melogine launches.</h2>
       if (!canvas || !hero || !canvas.getContext) return;
 
       var ctx = canvas.getContext('2d');
-      var CYCLE_MS = 7000;
-      var FADE_IN_MS = 500;
       var CONVERGE_MS = 1500;
-      var PULSE_MS = 1500;
+      var HOLD_MS = 2000;
+      var KEY_FADE_MS = 500;
       var DRIFT_MS = 1500;
-      var FADE_OUT_MS = 500;
-      var CONVERGE_START = FADE_IN_MS;
-      var PULSE_START = CONVERGE_START + CONVERGE_MS;
-      var DRIFT_START = PULSE_START + PULSE_MS;
-      var FADE_OUT_START = DRIFT_START + DRIFT_MS;
+      var T_CONVERGE_END = CONVERGE_MS;
+      var T_HOLD_END = T_CONVERGE_END + HOLD_MS;
+      var T_KEYFADE_END = T_HOLD_END + KEY_FADE_MS;
+      var T_DRIFT_END = T_KEYFADE_END + DRIFT_MS;
+
       var KEYS = [
         'C Major',
         'A Minor',
@@ -1137,15 +1152,19 @@ when Melogine launches.</h2>
       var SYNC_AMP = 60;
       var PARTICLE_SPACING = 12;
       var PARTICLE_R = 2;
-      /** Pixel offsets from vertical centre — ~24px apart, span 96px inside ~120px band */
       var WAVE_Y_OFFSETS = [-48, -24, 0, 24, 48];
 
       var dpr = Math.min(window.devicePixelRatio || 1, 2);
       var logicalW = 0;
       var logicalH = 0;
-      var loopAnchor = performance.now();
-      var lastCycleIndex = -1;
-      var activeKeyIndex = 0;
+      var segmentStart = performance.now();
+      var pauseMs = 3000 + Math.random() * 1000;
+      var selectedKeyIndex = null;
+      var autoCycleKeyIndex = 0;
+      var needConvergeSnap = false;
+      var keyFadeCleared = false;
+      var initialPauseEnd = performance.now() + 3000 + Math.random() * 1000;
+      var initialPauseDone = false;
 
       var waveDefs = [
         { amp: 108, freq: 0.018, speed: 0.62, phase: 1.1 },
@@ -1156,6 +1175,10 @@ when Melogine launches.</h2>
       ];
 
       var waves = [];
+
+      function randomPauseMs() {
+        return 3000 + Math.random() * 1000;
+      }
 
       function applyWaveVerticalPositions() {
         var cy = logicalH * 0.5;
@@ -1181,6 +1204,9 @@ when Melogine launches.</h2>
 
       function initWaves() {
         waves = [];
+        var speedOmegas = [0.00035, 0.00042, 0.00055, 0.00068, 0.00078];
+        var ampOmegas = [0.00028, 0.00038, 0.0005, 0.00062, 0.00072];
+        var freqOmegas = [0.00032, 0.0004, 0.00048, 0.00058, 0.00066];
         for (var i = 0; i < waveDefs.length; i++) {
           var d = waveDefs[i];
           waves.push({
@@ -1189,20 +1215,24 @@ when Melogine launches.</h2>
             origSpeed: d.speed,
             origPhase: d.phase,
             scroll: Math.random() * 500,
-            amp: d.amp,
-            freq: d.freq,
-            speed: d.speed,
-            phase: d.phase,
             opacity: OPACITIES[i],
             origBaseY: 0,
             targetY: 0,
-            baseY: 0
+            phaseNoise: 0,
+            speedOmega: speedOmegas[i],
+            ampOmega: ampOmegas[i],
+            freqOmega: freqOmegas[i],
+            speedPhase0: Math.random() * Math.PI * 2,
+            ampPhase0: Math.random() * Math.PI * 2,
+            freqPhase0: Math.random() * Math.PI * 2,
+            snapAmp: d.amp,
+            snapFreq: d.freq,
+            snapPhase: d.phase,
+            snapBaseY: 0,
+            snapSpeedMul: 1
           });
         }
         resize();
-        for (var j = 0; j < waves.length; j++) {
-          waves[j].baseY = waves[j].origBaseY;
-        }
       }
 
       function lerp(a, b, t) {
@@ -1213,14 +1243,30 @@ when Melogine launches.</h2>
         return x < 0 ? 0 : x > 1 ? 1 : x;
       }
 
+      function getSpeedMul(w, ts) {
+        return 1 + 0.15 * Math.sin(ts * w.speedOmega + w.speedPhase0);
+      }
+
+      function getOrganicAmp(w, ts) {
+        return w.origAmp * (1 + 0.2 * Math.sin(ts * w.ampOmega + w.ampPhase0));
+      }
+
+      function getOrganicFreq(w, ts) {
+        return w.origFreq * (1 + 0.05 * Math.sin(ts * w.freqOmega + w.freqPhase0));
+      }
+
+      function getOrganicPhase(w) {
+        return w.origPhase + w.phaseNoise;
+      }
+
       function updateKeyListHighlight() {
         if (!keyList) return;
         var buttons = keyList.querySelectorAll('.hero-key-list__btn');
-        var b;
         var i;
+        var b;
         for (i = 0; i < buttons.length; i++) {
           b = buttons[i];
-          if (parseInt(b.getAttribute('data-key-index'), 10) === activeKeyIndex) {
+          if (selectedKeyIndex !== null && parseInt(b.getAttribute('data-key-index'), 10) === selectedKeyIndex) {
             b.classList.add('hero-key-list__btn--active');
             b.setAttribute('aria-current', 'true');
           } else {
@@ -1230,76 +1276,145 @@ when Melogine launches.</h2>
         }
       }
 
-      function triggerResyncNow() {
-        var now = performance.now();
-        loopAnchor = now - CONVERGE_START;
-        var elapsed = now - loopAnchor;
-        lastCycleIndex = Math.floor(elapsed / CYCLE_MS);
+      function beginSyncSequence(now, keyIdx) {
+        segmentStart = now;
+        selectedKeyIndex = keyIdx;
+        pauseMs = randomPauseMs();
+        needConvergeSnap = true;
+        keyFadeCleared = false;
+        updateKeyListHighlight();
       }
 
-      function drawFrame(t) {
+      function getSegment(now) {
+        if (!initialPauseDone) {
+          if (now < initialPauseEnd) {
+            return { kind: 'boot_pause', t: 0 };
+          }
+          initialPauseDone = true;
+          beginSyncSequence(now, autoCycleKeyIndex);
+          autoCycleKeyIndex = (autoCycleKeyIndex + 1) % KEYS.length;
+        }
+        var total = T_DRIFT_END + pauseMs;
+        while (now - segmentStart >= total) {
+          segmentStart += total;
+          pauseMs = randomPauseMs();
+          var k = autoCycleKeyIndex;
+          autoCycleKeyIndex = (autoCycleKeyIndex + 1) % KEYS.length;
+          selectedKeyIndex = k;
+          needConvergeSnap = true;
+          keyFadeCleared = false;
+          updateKeyListHighlight();
+          total = T_DRIFT_END + pauseMs;
+        }
+        var t = now - segmentStart;
+        if (needConvergeSnap && t >= T_CONVERGE_END) {
+          needConvergeSnap = false;
+        }
+        if (t < T_CONVERGE_END) return { kind: 'converge', t: t };
+        if (t < T_HOLD_END) return { kind: 'hold', t: t };
+        if (t < T_KEYFADE_END) return { kind: 'keyfade', t: t };
+        if (t < T_DRIFT_END) return { kind: 'drift', t: t };
+        return { kind: 'pause', t: t };
+      }
+
+      function drawFrame(now) {
+        var ts = now;
         var i;
+        var seg = getSegment(now);
+        var kind = seg.kind;
+        var t = seg.t;
+
+        for (i = 0; i < waves.length; i++) {
+          waves[i].phaseNoise += (Math.random() - 0.5) * 0.002;
+        }
+
+        if (kind === 'converge' && needConvergeSnap) {
+          for (i = 0; i < waves.length; i++) {
+            var ww = waves[i];
+            ww.snapAmp = getOrganicAmp(ww, ts);
+            ww.snapFreq = getOrganicFreq(ww, ts);
+            ww.snapPhase = getOrganicPhase(ww);
+            ww.snapBaseY = ww.origBaseY;
+            ww.snapSpeedMul = getSpeedMul(ww, ts);
+          }
+          needConvergeSnap = false;
+        }
+
+        if (kind === 'keyfade' && !keyFadeCleared) {
+          selectedKeyIndex = null;
+          updateKeyListHighlight();
+          keyFadeCleared = true;
+        }
+
         ctx.clearRect(0, 0, logicalW, logicalH);
         ctx.save();
         ctx.globalCompositeOperation = 'screen';
 
         var convergeK = 0;
-        if (t >= CONVERGE_START && t < PULSE_START) {
-          convergeK = clamp01((t - CONVERGE_START) / CONVERGE_MS);
-        }
-
-        var pulseAmp = SYNC_AMP;
-        if (t >= PULSE_START && t < DRIFT_START) {
-          var pulseT = (t - PULSE_START) / PULSE_MS;
-          var breathe = Math.sin(pulseT * Math.PI);
-          pulseAmp = SYNC_AMP + 10 * breathe;
+        if (kind === 'converge') {
+          convergeK = clamp01(t / CONVERGE_MS);
         }
 
         var driftK = 0;
-        if (t >= DRIFT_START && t < FADE_OUT_START) {
-          driftK = clamp01((t - DRIFT_START) / DRIFT_MS);
+        if (kind === 'drift') {
+          driftK = clamp01((t - T_KEYFADE_END) / DRIFT_MS);
         }
 
         for (i = 0; i < waves.length; i++) {
           var w = waves[i];
+          var oAmp = getOrganicAmp(w, ts);
+          var oFreq = getOrganicFreq(w, ts);
+          var oPhase = getOrganicPhase(w);
           var amp;
           var freq;
           var baseY;
-          var phase;
+          var phaseArg;
+          var speedMul;
 
-          if (t < CONVERGE_START) {
-            amp = w.origAmp;
-            freq = w.origFreq;
+          if (kind === 'boot_pause' || kind === 'pause') {
+            amp = oAmp;
+            freq = oFreq;
             baseY = w.origBaseY;
-            phase = w.origPhase;
-          } else if (t < PULSE_START) {
-            amp = lerp(w.origAmp, SYNC_AMP, convergeK);
-            freq = lerp(w.origFreq, SYNC_FREQ, convergeK);
-            baseY = lerp(w.origBaseY, w.targetY, convergeK);
-            phase = lerp(w.origPhase, 0, convergeK);
-          } else if (t < DRIFT_START) {
-            amp = pulseAmp;
+            phaseArg = oPhase;
+            speedMul = getSpeedMul(w, ts);
+          } else if (kind === 'converge') {
+            amp = lerp(w.snapAmp, SYNC_AMP, convergeK);
+            freq = lerp(w.snapFreq, SYNC_FREQ, convergeK);
+            baseY = lerp(w.snapBaseY, w.targetY, convergeK);
+            phaseArg = lerp(w.snapPhase, 0, convergeK);
+            speedMul = lerp(w.snapSpeedMul, 1, convergeK);
+          } else if (kind === 'hold') {
+            amp = SYNC_AMP;
             freq = SYNC_FREQ;
             baseY = w.targetY;
-            phase = 0;
-          } else if (t < FADE_OUT_START) {
-            amp = lerp(SYNC_AMP, w.origAmp, driftK);
-            freq = lerp(SYNC_FREQ, w.origFreq, driftK);
+            phaseArg = 0;
+            speedMul = 1;
+          } else if (kind === 'keyfade') {
+            amp = SYNC_AMP;
+            freq = SYNC_FREQ;
+            baseY = w.targetY;
+            phaseArg = 0;
+            speedMul = 1;
+          } else if (kind === 'drift') {
+            amp = lerp(SYNC_AMP, oAmp, driftK);
+            freq = lerp(SYNC_FREQ, oFreq, driftK);
             baseY = lerp(w.targetY, w.origBaseY, driftK);
-            phase = lerp(0, w.origPhase, driftK);
+            phaseArg = lerp(0, oPhase, driftK);
+            speedMul = lerp(1, getSpeedMul(w, ts), driftK);
           } else {
-            amp = w.origAmp;
-            freq = w.origFreq;
+            amp = oAmp;
+            freq = oFreq;
             baseY = w.origBaseY;
-            phase = w.origPhase;
+            phaseArg = oPhase;
+            speedMul = getSpeedMul(w, ts);
           }
 
-          w.scroll += w.origSpeed;
+          w.scroll += w.origSpeed * speedMul;
           if (w.scroll > 100000) w.scroll -= 100000;
 
           var x = 0;
           while (x <= logicalW + PARTICLE_SPACING) {
-            var y = baseY + amp * Math.sin(freq * (x + w.scroll) + phase);
+            var y = baseY + amp * Math.sin(freq * (x + w.scroll) + phaseArg);
             ctx.beginPath();
             ctx.arc(x, y, PARTICLE_R, 0, Math.PI * 2);
             ctx.fillStyle = 'rgba(' + ACCENT + ',' + w.opacity + ')';
@@ -1312,17 +1427,7 @@ when Melogine launches.</h2>
       }
 
       function frame(now) {
-        var elapsed = now - loopAnchor;
-        var cycleIndex = Math.floor(elapsed / CYCLE_MS);
-        if (cycleIndex !== lastCycleIndex) {
-          if (lastCycleIndex >= 0) {
-            activeKeyIndex = (activeKeyIndex + 1) % KEYS.length;
-            updateKeyListHighlight();
-          }
-          lastCycleIndex = cycleIndex;
-        }
-        var t = elapsed - cycleIndex * CYCLE_MS;
-        drawFrame(t);
+        drawFrame(now);
         requestAnimationFrame(frame);
       }
 
@@ -1331,13 +1436,9 @@ when Melogine launches.</h2>
           var btn = e.target.closest('.hero-key-list__btn');
           if (!btn || !keyList.contains(btn)) return;
           var idx = parseInt(btn.getAttribute('data-key-index'), 10);
-          if (idx === activeKeyIndex) {
-            triggerResyncNow();
-            return;
-          }
-          activeKeyIndex = idx;
-          updateKeyListHighlight();
-          triggerResyncNow();
+          initialPauseDone = true;
+          autoCycleKeyIndex = (idx + 1) % KEYS.length;
+          beginSyncSequence(performance.now(), idx);
         });
       }
 
