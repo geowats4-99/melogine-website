@@ -218,22 +218,69 @@
       z-index: 0;
     }
 
-    .hero-key-picker {
+    .hero-key-hud {
+      background: #2A2723;
       border: 1px solid #3D3A35;
-      border-radius: 8px;
-      color: #F5F0E8;
-      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-      font-size: 13px;
-      left: 50%;
-      opacity: 0;
-      padding: 8px 14px;
+      border-radius: 12px;
+      left: 32px;
+      padding: 12px 16px;
       pointer-events: none;
       position: absolute;
-      top: calc(var(--nav-height) + 20px);
-      transform: translateX(-50%);
+      top: 32px;
       z-index: 1;
-      background: #2A2723;
     }
+
+    .hero-key-hud__keywrap {
+      margin-bottom: 10px;
+      min-height: 1.25em;
+      position: relative;
+    }
+
+    .hero-key-hud__key {
+      color: #f5f0e8;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      left: 0;
+      line-height: 1.25;
+      opacity: 0;
+      position: absolute;
+      top: 0;
+      transition: opacity 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .hero-key-hud__key.is-visible {
+      opacity: 1;
+    }
+
+    .hero-key-hud__degrees {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 4px;
+    }
+
+    .hero-key-hud__pill {
+      align-items: center;
+      border-radius: 4px;
+      color: #1c1a17;
+      display: inline-flex;
+      flex-shrink: 0;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      height: 20px;
+      justify-content: center;
+      width: 24px;
+    }
+
+    .hero-key-hud__pill--i { background: #ff2d2d; }
+    .hero-key-hud__pill--ii { background: #ff7a1a; }
+    .hero-key-hud__pill--iii { background: #ffe000; }
+    .hero-key-hud__pill--iv { background: #00f060; }
+    .hero-key-hud__pill--v { background: #00cfff; }
+    .hero-key-hud__pill--vi { background: #6060ff; }
+    .hero-key-hud__pill--vii { background: #cc40ff; }
 
     .hero__foreground {
       position: relative;
@@ -265,6 +312,19 @@
       line-height: 1.6;
       margin-top: 24px;
       max-width: 540px;
+    }
+
+    .hero__caption {
+      color: var(--text-secondary);
+      font-size: 15px;
+      line-height: 1.55;
+      margin-top: 16px;
+      max-width: 540px;
+      text-align: center;
+    }
+
+    .hero__caption-accent {
+      color: var(--accent);
     }
 
     .hero__actions {
@@ -816,7 +876,21 @@
   <main id="top">
     <section class="hero">
       <canvas id="heroWaveCanvas" class="hero-wave-canvas" aria-hidden="true"></canvas>
-      <div id="heroKeyPicker" class="hero-key-picker" role="presentation">C Major</div>
+      <div class="hero-key-hud" id="heroKeyHud" role="region" aria-label="Key and scale degrees">
+        <div class="hero-key-hud__keywrap">
+          <span class="hero-key-hud__key is-visible" id="heroKeyA">C Major</span>
+          <span class="hero-key-hud__key" id="heroKeyB" aria-hidden="true"></span>
+        </div>
+        <div class="hero-key-hud__degrees" aria-hidden="true">
+          <span class="hero-key-hud__pill hero-key-hud__pill--i">I</span>
+          <span class="hero-key-hud__pill hero-key-hud__pill--ii">ii</span>
+          <span class="hero-key-hud__pill hero-key-hud__pill--iii">iii</span>
+          <span class="hero-key-hud__pill hero-key-hud__pill--iv">IV</span>
+          <span class="hero-key-hud__pill hero-key-hud__pill--v">V</span>
+          <span class="hero-key-hud__pill hero-key-hud__pill--vi">vi</span>
+          <span class="hero-key-hud__pill hero-key-hud__pill--vii">vii&deg;</span>
+        </div>
+      </div>
       <div class="hero__foreground">
         <div class="container">
           <div class="hero__content">
@@ -824,6 +898,9 @@
 who learn by doing.</h1>
             <p class="hero__subtitle">
               Melogine teaches music theory through a piano roll — the way you already think about music.
+            </p>
+            <p class="hero__caption">
+              No sheet music. No treble clef. <span class="hero__caption-accent">F*** the classics</span> — just the piano roll you already think in.
             </p>
             <div class="hero__actions">
               <a class="button button-primary" href="#early-access">Get Early Access</a>
@@ -1040,7 +1117,8 @@ when Melogine launches.</h2>
   <script>
     (function () {
       var canvas = document.getElementById('heroWaveCanvas');
-      var keyPicker = document.getElementById('heroKeyPicker');
+      var heroKeyA = document.getElementById('heroKeyA');
+      var heroKeyB = document.getElementById('heroKeyB');
       var hero = document.querySelector('.hero');
       if (!canvas || !hero || !canvas.getContext) return;
 
@@ -1055,7 +1133,15 @@ when Melogine launches.</h2>
       var PULSE_START = CONVERGE_START + CONVERGE_MS;
       var DRIFT_START = PULSE_START + PULSE_MS;
       var FADE_OUT_START = DRIFT_START + DRIFT_MS;
-      var KEYS = ['C Major', 'A Minor', 'F Major'];
+      var KEYS = [
+        'C Major',
+        'A Minor',
+        'F Major',
+        'G Major',
+        'D Minor',
+        'Bb Major',
+        'E Minor'
+      ];
       var ACCENT = '232, 160, 32';
       var OPACITIES = [0.25, 0.18, 0.22, 0.15, 0.2];
       var SYNC_FREQ = 0.012;
@@ -1135,13 +1221,19 @@ when Melogine launches.</h2>
         return x < 0 ? 0 : x > 1 ? 1 : x;
       }
 
-      function keyPickerOpacity(t) {
-        if (t < FADE_IN_MS) return t / FADE_IN_MS;
-        if (t < FADE_OUT_START) return 1;
-        if (t < FADE_OUT_START + FADE_OUT_MS) {
-          return 1 - (t - FADE_OUT_START) / FADE_OUT_MS;
-        }
-        return 0;
+      var keyVisibleIsA = true;
+
+      function crossfadeKeyName(keyIndex) {
+        if (!heroKeyA || !heroKeyB) return;
+        var text = KEYS[keyIndex % KEYS.length];
+        var showEl = keyVisibleIsA ? heroKeyB : heroKeyA;
+        var hideEl = keyVisibleIsA ? heroKeyA : heroKeyB;
+        showEl.textContent = text;
+        showEl.setAttribute('aria-hidden', 'false');
+        hideEl.setAttribute('aria-hidden', 'true');
+        hideEl.classList.remove('is-visible');
+        showEl.classList.add('is-visible');
+        keyVisibleIsA = !keyVisibleIsA;
       }
 
       function drawFrame(t) {
@@ -1216,15 +1308,16 @@ when Melogine launches.</h2>
         }
 
         ctx.restore();
-        keyPicker.style.opacity = String(keyPickerOpacity(t));
       }
 
       function frame(now) {
         var elapsed = now - loopAnchor;
         var cycleIndex = Math.floor(elapsed / CYCLE_MS);
         if (cycleIndex !== lastCycleIndex) {
+          if (lastCycleIndex >= 0) {
+            crossfadeKeyName(cycleIndex % KEYS.length);
+          }
           lastCycleIndex = cycleIndex;
-          keyPicker.textContent = KEYS[cycleIndex % KEYS.length];
         }
         var t = elapsed - cycleIndex * CYCLE_MS;
         drawFrame(t);
