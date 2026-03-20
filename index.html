@@ -201,8 +201,44 @@
       align-items: center;
       display: flex;
       min-height: 100vh;
+      overflow: hidden;
       padding: calc(var(--nav-height) + 40px) 0 72px;
+      position: relative;
       text-align: center;
+    }
+
+    .hero-wave-canvas {
+      bottom: 0;
+      left: 0;
+      pointer-events: none;
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 100%;
+      z-index: 0;
+    }
+
+    .hero-key-picker {
+      border: 1px solid #3D3A35;
+      border-radius: 8px;
+      color: #F5F0E8;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 13px;
+      left: 50%;
+      opacity: 0;
+      padding: 8px 14px;
+      pointer-events: none;
+      position: absolute;
+      top: calc(var(--nav-height) + 20px);
+      transform: translateX(-50%);
+      z-index: 1;
+      background: #2A2723;
+    }
+
+    .hero__foreground {
+      position: relative;
+      width: 100%;
+      z-index: 1;
     }
 
     .hero__content {
@@ -779,22 +815,26 @@
 
   <main id="top">
     <section class="hero">
-      <div class="container">
-        <div class="hero__content">
-          <h1 class="hero__title">Theory for producers
+      <canvas id="heroWaveCanvas" class="hero-wave-canvas" aria-hidden="true"></canvas>
+      <div id="heroKeyPicker" class="hero-key-picker" role="presentation">C Major</div>
+      <div class="hero__foreground">
+        <div class="container">
+          <div class="hero__content">
+            <h1 class="hero__title">Theory for producers
 who learn by doing.</h1>
-          <p class="hero__subtitle">
-            Melogine teaches music theory through a piano roll — the way you already think about music.
-          </p>
-          <div class="hero__actions">
-            <a class="button button-primary" href="#early-access">Get Early Access</a>
-            <a class="button button-secondary" href="#">Download on the App Store</a>
+            <p class="hero__subtitle">
+              Melogine teaches music theory through a piano roll — the way you already think about music.
+            </p>
+            <div class="hero__actions">
+              <a class="button button-primary" href="#early-access">Get Early Access</a>
+              <a class="button button-secondary" href="#">Download on the App Store</a>
+            </div>
+            <div class="hero-mockup" aria-label="Melogine app screenshots">
+              <img src="screenshots/IMG_4732.PNG" alt="Melogine Sandbox with Ghost Engine">
+              <img src="screenshots/IMG_4731.PNG" alt="Melogine Sandbox piano roll">
+            </div>
+            <p class="hero__footnote">Available on iOS 18.2 and above</p>
           </div>
-          <div class="hero-mockup" aria-label="Melogine app screenshots">
-            <img src="screenshots/IMG_4732.PNG" alt="Melogine Sandbox with Ghost Engine">
-            <img src="screenshots/IMG_4731.PNG" alt="Melogine Sandbox piano roll">
-          </div>
-          <p class="hero__footnote">Available on iOS 18.2 and above</p>
         </div>
       </div>
     </section>
@@ -997,5 +1037,206 @@ when Melogine launches.</h2>
       </div>
     </div>
   </footer>
+  <script>
+    (function () {
+      var canvas = document.getElementById('heroWaveCanvas');
+      var keyPicker = document.getElementById('heroKeyPicker');
+      var hero = document.querySelector('.hero');
+      if (!canvas || !hero || !canvas.getContext) return;
+
+      var ctx = canvas.getContext('2d');
+      var CYCLE_MS = 7000;
+      var FADE_IN_MS = 500;
+      var CONVERGE_MS = 1500;
+      var PULSE_MS = 1500;
+      var DRIFT_MS = 1500;
+      var FADE_OUT_MS = 500;
+      var CONVERGE_START = FADE_IN_MS;
+      var PULSE_START = CONVERGE_START + CONVERGE_MS;
+      var DRIFT_START = PULSE_START + PULSE_MS;
+      var FADE_OUT_START = DRIFT_START + DRIFT_MS;
+      var KEYS = ['C Major', 'A Minor', 'F Major'];
+      var ACCENT = '232, 160, 32';
+      var OPACITIES = [0.25, 0.18, 0.22, 0.15, 0.2];
+      var SYNC_FREQ = 0.012;
+      var SYNC_AMP = 60;
+      var PARTICLE_SPACING = 12;
+      var PARTICLE_R = 2;
+
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var logicalW = 0;
+      var logicalH = 0;
+      var loopAnchor = performance.now();
+      var lastCycleIndex = -1;
+
+      var waveDefs = [
+        { amp: 95, freq: 0.018, speed: 0.62, phase: 1.1, baseYNorm: 0.2 },
+        { amp: 52, freq: 0.01, speed: 0.38, phase: 2.4, baseYNorm: 0.34 },
+        { amp: 118, freq: 0.014, speed: 0.71, phase: 0.35, baseYNorm: 0.48 },
+        { amp: 44, freq: 0.008, speed: 0.45, phase: 3.8, baseYNorm: 0.62 },
+        { amp: 76, freq: 0.02, speed: 0.55, phase: 5.2, baseYNorm: 0.76 }
+      ];
+
+      var waves = [];
+      function syncTargetNorms() {
+        var c = 0.45;
+        var step = 0.06;
+        return [c - 2 * step, c - step, c, c + step, c + 2 * step];
+      }
+
+      function resize() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        var rect = hero.getBoundingClientRect();
+        logicalW = Math.max(1, rect.width);
+        logicalH = Math.max(1, rect.height);
+        canvas.width = Math.floor(logicalW * dpr);
+        canvas.height = Math.floor(logicalH * dpr);
+        canvas.style.width = logicalW + 'px';
+        canvas.style.height = logicalH + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        var norms = syncTargetNorms();
+        for (var i = 0; i < waves.length; i++) {
+          waves[i].targetY = norms[i] * logicalH;
+          waves[i].origBaseY = waveDefs[i].baseYNorm * logicalH;
+        }
+      }
+
+      function initWaves() {
+        waves = [];
+        for (var i = 0; i < waveDefs.length; i++) {
+          var d = waveDefs[i];
+          waves.push({
+            origAmp: d.amp,
+            origFreq: d.freq,
+            origSpeed: d.speed,
+            origPhase: d.phase,
+            scroll: Math.random() * 500,
+            amp: d.amp,
+            freq: d.freq,
+            speed: d.speed,
+            phase: d.phase,
+            opacity: OPACITIES[i],
+            origBaseY: 0,
+            targetY: 0,
+            baseY: 0
+          });
+        }
+        resize();
+        for (var j = 0; j < waves.length; j++) {
+          waves[j].baseY = waves[j].origBaseY;
+        }
+      }
+
+      function lerp(a, b, t) {
+        return a + (b - a) * t;
+      }
+
+      function clamp01(x) {
+        return x < 0 ? 0 : x > 1 ? 1 : x;
+      }
+
+      function keyPickerOpacity(t) {
+        if (t < FADE_IN_MS) return t / FADE_IN_MS;
+        if (t < FADE_OUT_START) return 1;
+        if (t < FADE_OUT_START + FADE_OUT_MS) {
+          return 1 - (t - FADE_OUT_START) / FADE_OUT_MS;
+        }
+        return 0;
+      }
+
+      function drawFrame(t) {
+        var i;
+        ctx.clearRect(0, 0, logicalW, logicalH);
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+
+        var convergeK = 0;
+        if (t >= CONVERGE_START && t < PULSE_START) {
+          convergeK = clamp01((t - CONVERGE_START) / CONVERGE_MS);
+        }
+
+        var pulseAmp = SYNC_AMP;
+        if (t >= PULSE_START && t < DRIFT_START) {
+          var pulseT = (t - PULSE_START) / PULSE_MS;
+          var breathe = Math.sin(pulseT * Math.PI);
+          pulseAmp = SYNC_AMP + 10 * breathe;
+        }
+
+        var driftK = 0;
+        if (t >= DRIFT_START && t < FADE_OUT_START) {
+          driftK = clamp01((t - DRIFT_START) / DRIFT_MS);
+        }
+
+        for (i = 0; i < waves.length; i++) {
+          var w = waves[i];
+          var amp;
+          var freq;
+          var baseY;
+          var phase;
+
+          if (t < CONVERGE_START) {
+            amp = w.origAmp;
+            freq = w.origFreq;
+            baseY = w.origBaseY;
+            phase = w.origPhase;
+          } else if (t < PULSE_START) {
+            amp = lerp(w.origAmp, SYNC_AMP, convergeK);
+            freq = lerp(w.origFreq, SYNC_FREQ, convergeK);
+            baseY = lerp(w.origBaseY, w.targetY, convergeK);
+            phase = lerp(w.origPhase, 0, convergeK);
+          } else if (t < DRIFT_START) {
+            amp = pulseAmp;
+            freq = SYNC_FREQ;
+            baseY = w.targetY;
+            phase = 0;
+          } else if (t < FADE_OUT_START) {
+            amp = lerp(SYNC_AMP, w.origAmp, driftK);
+            freq = lerp(SYNC_FREQ, w.origFreq, driftK);
+            baseY = lerp(w.targetY, w.origBaseY, driftK);
+            phase = lerp(0, w.origPhase, driftK);
+          } else {
+            amp = w.origAmp;
+            freq = w.origFreq;
+            baseY = w.origBaseY;
+            phase = w.origPhase;
+          }
+
+          w.scroll += w.origSpeed;
+          if (w.scroll > 100000) w.scroll -= 100000;
+
+          var x = 0;
+          while (x <= logicalW + PARTICLE_SPACING) {
+            var y = baseY + amp * Math.sin(freq * (x + w.scroll) + phase);
+            ctx.beginPath();
+            ctx.arc(x, y, PARTICLE_R, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(' + ACCENT + ',' + w.opacity + ')';
+            ctx.fill();
+            x += PARTICLE_SPACING;
+          }
+        }
+
+        ctx.restore();
+        keyPicker.style.opacity = String(keyPickerOpacity(t));
+      }
+
+      function frame(now) {
+        var elapsed = now - loopAnchor;
+        var cycleIndex = Math.floor(elapsed / CYCLE_MS);
+        if (cycleIndex !== lastCycleIndex) {
+          lastCycleIndex = cycleIndex;
+          keyPicker.textContent = KEYS[cycleIndex % KEYS.length];
+        }
+        var t = elapsed - cycleIndex * CYCLE_MS;
+        drawFrame(t);
+        requestAnimationFrame(frame);
+      }
+
+      initWaves();
+      window.addEventListener('resize', function () {
+        resize();
+      });
+      requestAnimationFrame(frame);
+    })();
+  </script>
 </body>
 </html>
