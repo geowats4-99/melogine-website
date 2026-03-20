@@ -1150,6 +1150,7 @@ when Melogine launches.</h2>
       var OPACITIES = [0.25, 0.18, 0.22, 0.15, 0.2];
       var SYNC_FREQ = 0.012;
       var SYNC_AMP = 60;
+      var SYNC_SCROLL_SPEED = 0.542;
       var PARTICLE_SPACING = 12;
       var PARTICLE_R = 2;
       var WAVE_Y_OFFSETS = [-48, -24, 0, 24, 48];
@@ -1165,6 +1166,8 @@ when Melogine launches.</h2>
       var keyFadeCleared = false;
       var initialPauseEnd = performance.now() + 3000 + Math.random() * 1000;
       var initialPauseDone = false;
+      var sharedSyncScroll = 0;
+      var driftScrollSeeded = false;
 
       var waveDefs = [
         { amp: 108, freq: 0.018, speed: 0.62, phase: 1.1 },
@@ -1229,7 +1232,8 @@ when Melogine launches.</h2>
             snapFreq: d.freq,
             snapPhase: d.phase,
             snapBaseY: 0,
-            snapSpeedMul: 1
+            snapSpeedMul: 1,
+            snapScroll: 0
           });
         }
         resize();
@@ -1282,6 +1286,7 @@ when Melogine launches.</h2>
         pauseMs = randomPauseMs();
         needConvergeSnap = true;
         keyFadeCleared = false;
+        driftScrollSeeded = false;
         updateKeyListHighlight();
       }
 
@@ -1303,6 +1308,7 @@ when Melogine launches.</h2>
           selectedKeyIndex = k;
           needConvergeSnap = true;
           keyFadeCleared = false;
+          driftScrollSeeded = false;
           updateKeyListHighlight();
           total = T_DRIFT_END + pauseMs;
         }
@@ -1329,6 +1335,7 @@ when Melogine launches.</h2>
         }
 
         if (kind === 'converge' && needConvergeSnap) {
+          var sumScroll = 0;
           for (i = 0; i < waves.length; i++) {
             var ww = waves[i];
             ww.snapAmp = getOrganicAmp(ww, ts);
@@ -1336,7 +1343,10 @@ when Melogine launches.</h2>
             ww.snapPhase = getOrganicPhase(ww);
             ww.snapBaseY = ww.origBaseY;
             ww.snapSpeedMul = getSpeedMul(ww, ts);
+            ww.snapScroll = ww.scroll;
+            sumScroll += ww.scroll;
           }
+          sharedSyncScroll = sumScroll / waves.length;
           needConvergeSnap = false;
         }
 
@@ -1352,12 +1362,25 @@ when Melogine launches.</h2>
 
         var convergeK = 0;
         if (kind === 'converge') {
-          convergeK = clamp01(t / CONVERGE_MS);
+          convergeK = t >= CONVERGE_MS ? 1 : t / CONVERGE_MS;
         }
 
         var driftK = 0;
         if (kind === 'drift') {
-          driftK = clamp01((t - T_KEYFADE_END) / DRIFT_MS);
+          driftK = t >= T_DRIFT_END ? 1 : (t - T_KEYFADE_END) / DRIFT_MS;
+        }
+
+        var syncCenterY = logicalH * 0.5;
+        if (kind === 'converge' || kind === 'hold' || kind === 'keyfade') {
+          sharedSyncScroll += SYNC_SCROLL_SPEED;
+          if (sharedSyncScroll > 100000) sharedSyncScroll -= 100000;
+        }
+
+        if (kind === 'drift' && !driftScrollSeeded) {
+          for (i = 0; i < waves.length; i++) {
+            waves[i].scroll = sharedSyncScroll;
+          }
+          driftScrollSeeded = true;
         }
 
         for (i = 0; i < waves.length; i++) {
@@ -1370,6 +1393,7 @@ when Melogine launches.</h2>
           var baseY;
           var phaseArg;
           var speedMul;
+          var scrollDraw;
 
           if (kind === 'boot_pause' || kind === 'pause') {
             amp = oAmp;
@@ -1377,44 +1401,53 @@ when Melogine launches.</h2>
             baseY = w.origBaseY;
             phaseArg = oPhase;
             speedMul = getSpeedMul(w, ts);
+            w.scroll += w.origSpeed * speedMul;
+            if (w.scroll > 100000) w.scroll -= 100000;
+            scrollDraw = w.scroll;
           } else if (kind === 'converge') {
             amp = lerp(w.snapAmp, SYNC_AMP, convergeK);
             freq = lerp(w.snapFreq, SYNC_FREQ, convergeK);
-            baseY = lerp(w.snapBaseY, w.targetY, convergeK);
+            baseY = lerp(w.snapBaseY, syncCenterY, convergeK);
             phaseArg = lerp(w.snapPhase, 0, convergeK);
             speedMul = lerp(w.snapSpeedMul, 1, convergeK);
+            scrollDraw = lerp(w.snapScroll, sharedSyncScroll, convergeK);
           } else if (kind === 'hold') {
             amp = SYNC_AMP;
             freq = SYNC_FREQ;
-            baseY = w.targetY;
+            baseY = syncCenterY;
             phaseArg = 0;
             speedMul = 1;
+            scrollDraw = sharedSyncScroll;
           } else if (kind === 'keyfade') {
             amp = SYNC_AMP;
             freq = SYNC_FREQ;
-            baseY = w.targetY;
+            baseY = syncCenterY;
             phaseArg = 0;
             speedMul = 1;
+            scrollDraw = sharedSyncScroll;
           } else if (kind === 'drift') {
             amp = lerp(SYNC_AMP, oAmp, driftK);
             freq = lerp(SYNC_FREQ, oFreq, driftK);
-            baseY = lerp(w.targetY, w.origBaseY, driftK);
+            baseY = lerp(syncCenterY, w.origBaseY, driftK);
             phaseArg = lerp(0, oPhase, driftK);
             speedMul = lerp(1, getSpeedMul(w, ts), driftK);
+            w.scroll += w.origSpeed * speedMul;
+            if (w.scroll > 100000) w.scroll -= 100000;
+            scrollDraw = w.scroll;
           } else {
             amp = oAmp;
             freq = oFreq;
             baseY = w.origBaseY;
             phaseArg = oPhase;
             speedMul = getSpeedMul(w, ts);
+            w.scroll += w.origSpeed * speedMul;
+            if (w.scroll > 100000) w.scroll -= 100000;
+            scrollDraw = w.scroll;
           }
-
-          w.scroll += w.origSpeed * speedMul;
-          if (w.scroll > 100000) w.scroll -= 100000;
 
           var x = 0;
           while (x <= logicalW + PARTICLE_SPACING) {
-            var y = baseY + amp * Math.sin(freq * (x + w.scroll) + phaseArg);
+            var y = baseY + amp * Math.sin(freq * (x + scrollDraw) + phaseArg);
             ctx.beginPath();
             ctx.arc(x, y, PARTICLE_R, 0, Math.PI * 2);
             ctx.fillStyle = 'rgba(' + ACCENT + ',' + w.opacity + ')';
