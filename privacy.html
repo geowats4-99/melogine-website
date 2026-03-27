@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy | Melogine</title>
+  <meta name="description" content="Melogine Privacy Policy">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
+
+    :root {
+      /* Colors */
+      --bg: #1C1A17;
+      --surface: #2A2723;
+      --elevated: #333028;
+      --border: #3D3A35;
+      --text-primary: #F5F0E8;
+      --text-secondary: #8A8480;
+      --accent: #E8A020;
+      --bg-alt: #161412;
+      --dark-text: #1C1A17;
+      --green: #00F060;
+
+      /* Spacing (8pt Grid) */
+      --sp-1: 4px;
+      --sp-2: 8px;
+      --sp-3: 12px;
+      --sp-4: 16px;
+      --sp-6: 24px;
+      --sp-8: 32px;
+      --sp-10: 40px;
+      --sp-12: 48px;
+      --sp-16: 64px;
+      --sp-20: 80px;
+      --sp-24: 96px;
+      --sp-32: 128px;
+
+      /* Typography */
+      --text-xs: 12px;
+      --text-sm: 14px;
+      --text-base: 16px;
+      --text-lg: 18px;
+      --text-xl: 20px;
+      --text-2xl: 24px;
+      --text-3xl: 32px;
+      --text-4xl: 40px;
+      --text-5xl: 48px;
+      --text-6xl: 64px;
+      --text-7xl: 72px;
+
+      /* Core */
+      --container: 1160px;
+      --radius: 16px;
+      --nav-height: 88px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      width: min(100% - 48px, var(--container));
+      margin: 0 auto;
+    }
+
+    .site-nav {
+      background: rgba(28, 26, 23, 0.95);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(61, 58, 53, 0.7);
+      left: 0;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 20;
+    }
+
+    .site-nav__inner {
+      align-items: center;
+      display: flex;
+      justify-content: space-between;
+      min-height: var(--nav-height);
+    }
+
+    .wordmark {
+      color: var(--accent);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .nav-back {
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+      transition: color 0.2s;
+    }
+
+    .nav-back:hover {
+      color: var(--text-primary);
+    }
+
+    .main-content {
+      flex: 1;
+    }
+
+    .wrap {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: calc(var(--nav-height) + var(--sp-20)) 24px var(--sp-32);
+    }
+
+    .header {
+      margin-bottom: var(--sp-12);
+      padding-bottom: var(--sp-10);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-label {
+      color: var(--accent);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: var(--sp-4);
+    }
+
+    h1 {
+      font-size: var(--text-5xl);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: var(--sp-4);
+    }
+
+    .header-meta {
+      color: var(--text-secondary);
+      font-size: var(--text-sm);
+    }
+
+    .section {
+      margin-bottom: var(--sp-12);
+    }
+
+    h2 {
+      font-size: var(--text-xl);
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: var(--sp-4);
+      letter-spacing: -0.01em;
+    }
+
+    p {
+      color: var(--text-secondary);
+      font-size: var(--text-base);
+      line-height: 1.6;
+      margin-bottom: var(--sp-4);
+    }
+
+    p:last-child {
+      margin-bottom: 0;
+    }
+
+    .card {
+      background: linear-gradient(180deg, var(--surface) 0%, rgba(42,39,35,0.4) 100%);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--green);
+      border-radius: var(--radius);
+      padding: var(--sp-6);
+      margin: var(--sp-8) 0;
+    }
+
+    .card p {
+      color: var(--text-primary);
+      font-weight: 500;
+      margin-bottom: 0;
+    }
+
+    ul {
+      list-style: none;
+      margin: var(--sp-4) 0;
+    }
+
+    ul li {
+      font-size: var(--text-base);
+      color: var(--text-secondary);
+      padding: var(--sp-2) 0 var(--sp-2) var(--sp-6);
+      position: relative;
+    }
+
+    ul li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 14px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .contact-link {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s;
+    }
+
+    .contact-link:hover {
+      border-color: var(--accent);
+    }
+
+    .site-footer {
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+    }
+
+    .site-footer__inner {
+      align-items: center;
+      display: flex;
+      gap: 20px;
+      justify-content: space-between;
+    }
+
+    .site-footer__copy,
+    .site-footer__links a {
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+
+    .site-footer__links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .site-footer__links a:hover {
+      color: var(--text-primary);
+    }
+
+    @media (max-width: 600px) {
+      .site-footer__inner {
+        flex-direction: column;
+      }
+      .wrap {
+        padding: calc(var(--nav-height) + var(--sp-12)) 20px var(--sp-20);
+      }
+      h1 {
+        font-size: var(--text-4xl);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="container site-nav__inner">
+    <a href="/" class="wordmark" aria-label="Melogine home">Melogine</a>
+    <a href="/" class="nav-back">&larr; Back to home</a>
+  </div>
+</nav>
+
+<div class="main-content">
+  <div class="wrap">
+    <div class="header">
+      <div class="header-label">Legal</div>
+      <h1>Privacy Policy</h1>
+      <div class="header-meta">Last updated: March 2026</div>
+    </div>
+
+    <div class="section">
+      <h2>Overview</h2>
+      <p>Melogine is a music theory app built for producers. We've designed it with privacy in mind &mdash; we don't collect your personal data, we don't track you, and we don't sell anything about you to anyone.</p>
+      <div class="card">
+        <p>The short version: Melogine stores your preferences locally on your device. We never see them, and neither does anyone else.</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>What we collect</h2>
+      <p>We collect nothing. Melogine does not collect, transmit, or store any personal information on external servers. There is no Melogine account, no sign-up, and no user database.</p>
+      <p>The following data is stored locally on your device only, using Apple's standard UserDefaults system:</p>
+      <ul>
+        <li>Your chosen username (entered during onboarding)</li>
+        <li>Your app preferences and settings</li>
+        <li>Your progress in Fundamentals and Challenges</li>
+        <li>Your lives count and reset timestamps</li>
+        <li>Whether you have completed onboarding</li>
+      </ul>
+      <p>This data never leaves your device and is not accessible to us.</p>
+    </div>
+
+    <div class="section">
+      <h2>Purchases &amp; subscriptions</h2>
+      <p>Melogine offers optional in-app purchases (Melogine Pro) including monthly, yearly, and lifetime subscriptions. All purchases are processed entirely by Apple through the App Store.</p>
+      <p>We do not process, store, or have access to your payment information. Apple handles all billing, receipts, and subscription management. For questions about a charge, please contact Apple Support or visit your App Store subscription settings.</p>
+      <p>Your subscription status is verified locally on your device using Apple's StoreKit framework. We do not run our own subscription server.</p>
+    </div>
+
+    <div class="section">
+      <h2>Analytics &amp; tracking</h2>
+      <p>Melogine contains no third-party analytics, advertising SDKs, or tracking tools. We do not use Google Analytics, Firebase, Mixpanel, or any equivalent service.</p>
+      <p>We do not track your behaviour within the app, and we do not share any data with third parties for advertising purposes.</p>
+    </div>
+
+    <div class="section">
+      <h2>Third-party services</h2>
+      <p>Melogine integrates with the following Apple-provided frameworks:</p>
+      <ul>
+        <li>StoreKit 2 &mdash; for processing in-app purchases via the App Store</li>
+        <li>AudioKit &mdash; for audio playback, operating entirely on-device</li>
+      </ul>
+      <p>Both operate entirely on-device and do not transmit your data to any external server.</p>
+    </div>
+
+    <div class="section">
+      <h2>Children's privacy</h2>
+      <p>Melogine does not knowingly collect any data from children under the age of 13. Because we collect no personal data at all, the app is safe for users of all ages from a data privacy perspective.</p>
+    </div>
+
+    <div class="section">
+      <h2>Changes to this policy</h2>
+      <p>If we ever make material changes to this privacy policy &mdash; for example, if a future version of the app introduces any form of data collection &mdash; we will update this page and revise the "Last updated" date at the top. We recommend checking this page periodically.</p>
+    </div>
+
+    <div class="section">
+      <h2>Contact</h2>
+      <p>If you have any questions about this privacy policy or how Melogine handles your data, you can reach us at:</p>
+      <p><a href="mailto:hello@melogine.com" class="contact-link">hello@melogine.com</a></p>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <p class="site-footer__copy">&copy; 2026 Melogine</p>
+    <div class="site-footer__links">
+      <a href="/privacy">Privacy Policy</a>
+      <a href="/terms">Terms of Use</a>
+      <a href="mailto:hello@melogine.com">Contact</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
