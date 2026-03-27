@@ -3,7 +3,7 @@
   Deploy: Push to GitHub, connect repo to Netlify (netlify.com), set custom domain in Netlify settings.
   DNS: In GoDaddy, add a CNAME record pointing www to your Netlify subdomain, and an A record for @ to Netlify's load balancer IP.
   Mailchimp: Replace the form action URL with your Mailchimp embedded form action.
-  Feature demos: Screen recordings in page root (autoplay muted loop). Emotional Fingerprint still uses screenshots/IMG_4755.PNG.
+  Feature demos: /media/*.mp4|.mov (autoplay muted loop). Emotional Fingerprint: /screenshots/IMG_4755.PNG.
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -545,20 +545,27 @@
       max-width: 560px;
     }
 
+    /* ::before gives height: abs-positioned <video> alone collapses grid/flex rows to 0 in some browsers */
     .hero-mockup {
-      aspect-ratio: 9 / 19;
       background: linear-gradient(180deg, var(--surface) 0%, rgba(42,39,35,0.4) 100%);
       border: none;
       border-radius: 36px;
       box-shadow: var(--shadow-soft), var(--glass-border);
       margin: 0;
+      max-width: 280px;
       overflow: hidden;
       position: relative;
-      width: 280px;
+      width: min(280px, 100%);
+    }
+
+    .hero-mockup::before {
+      content: '';
+      display: block;
+      padding-bottom: calc(100% * 19 / 9);
+      width: 100%;
     }
 
     .hero-mockup video {
-      display: block;
       height: calc(100% + var(--screen-recording-crop-top));
       left: 0;
       object-fit: cover;
@@ -568,7 +575,6 @@
     }
 
     .app-screen-frame {
-      aspect-ratio: 9 / 19;
       background: var(--surface);
       border: none;
       border-radius: 36px;
@@ -577,6 +583,14 @@
       min-width: 0;
       overflow: hidden;
       position: relative;
+      width: 100%;
+    }
+
+    .app-screen-frame::before {
+      content: '';
+      display: block;
+      padding-bottom: calc(100% * 19 / 9);
+      width: 100%;
     }
 
     .app-screen-frame video {
@@ -598,6 +612,7 @@
     .screenshot-pair--single .app-screen-frame {
       flex: 0 1 280px;
       max-width: 100%;
+      width: min(280px, 100%);
     }
 
     .fundamentals-media {
@@ -608,6 +623,7 @@
 
     .fundamentals-media .app-screen-frame {
       flex: 0 1 auto;
+      max-width: 100%;
       width: min(280px, 100%);
     }
 
@@ -993,7 +1009,7 @@ who learn by doing.</h1>
             </div>
             <div class="hero__media-block">
               <div class="hero-mockup" aria-label="Melogine Sandbox screen recording">
-                <video autoplay muted loop playsinline src="ScreenRecording_03-27-2026 15-30-00_1.mov" aria-label="Melogine Sandbox demo"></video>
+                <video autoplay muted loop playsinline webkit-playsinline preload="auto" src="/media/sandbox.mov" aria-label="Melogine Sandbox demo"></video>
               </div>
               <p class="hero__footnote">Available on iOS 18.2 and above</p>
             </div>
@@ -1019,7 +1035,7 @@ You just don't know why yet.</h2>
         <div class="feature__media">
           <div class="screenshot-pair screenshot-pair--single">
             <div class="app-screen-frame">
-              <video autoplay muted loop playsinline src="ScreenRecording_03-27-2026 15-30-00_1.mov" aria-label="Melogine Sandbox demo"></video>
+              <video autoplay muted loop playsinline webkit-playsinline preload="auto" src="/media/sandbox.mov" aria-label="Melogine Sandbox demo"></video>
             </div>
           </div>
         </div>
@@ -1053,7 +1069,7 @@ in a DAW.</h2>
         <div class="feature__media">
           <div class="fundamentals-media">
             <div class="app-screen-frame">
-              <video autoplay muted loop playsinline src="ScreenRecording_03-27-2026 15-34-51_1.MP4" aria-label="Melogine Fundamentals demo"></video>
+              <video autoplay muted loop playsinline webkit-playsinline preload="auto" src="/media/fundamentals.mp4" aria-label="Melogine Fundamentals demo"></video>
             </div>
           </div>
         </div>
@@ -1065,27 +1081,7 @@ in a DAW.</h2>
         <div class="feature__media">
           <div class="screenshot-pair screenshot-pair--single">
             <div class="app-screen-frame">
-              <video autoplay muted loop playsinline src="ScreenRecording_03-27-2026 15-38-02_1.MP4" aria-label="Melogine Glossary demo"></video>
-            </div>
-          </div>
-        </div>
-        <div class="feature__copy">
-          <span class="eyebrow">Glossary</span>
-          <h2 class="section-title">Look it up without
-losing your flow.</h2>
-          <p class="section-body">
-            Intervals, chord symbols, and core terms — explained in plain language and tied to the piano roll, so you can clear up confusion mid-session instead of tab-hunting on Google.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="container feature">
-        <div class="feature__media">
-          <div class="screenshot-pair screenshot-pair--single">
-            <div class="app-screen-frame">
-              <video autoplay muted loop playsinline src="ScreenRecording_03-27-2026 15-33-05_1.MP4" aria-label="Melogine Challenges demo"></video>
+              <video autoplay muted loop playsinline webkit-playsinline preload="auto" src="/media/challenges.mp4" aria-label="Melogine Challenges demo"></video>
             </div>
           </div>
         </div>
@@ -1100,6 +1096,26 @@ Build what you don't.</h2>
       </div>
     </section>
 
+    <section class="section">
+      <div class="container feature">
+        <div class="feature__media">
+          <div class="screenshot-pair screenshot-pair--single">
+            <div class="app-screen-frame">
+              <video autoplay muted loop playsinline webkit-playsinline preload="auto" src="/media/glossary.mp4" aria-label="Melogine Glossary demo"></video>
+            </div>
+          </div>
+        </div>
+        <div class="feature__copy">
+          <span class="eyebrow">Glossary</span>
+          <h2 class="section-title">Look it up without
+losing your flow.</h2>
+          <p class="section-body">
+            Intervals, chord symbols, and core terms — explained in plain language and tied to the piano roll, so you can clear up confusion mid-session instead of tab-hunting on Google.
+          </p>
+        </div>
+      </div>
+    </section>
+
     <section class="section section-surface emotion">
       <div class="container">
         <div class="emotion__inner">
@@ -1109,7 +1125,7 @@ you finish the chord.</h2>
           <p class="emotion__body">
             A real-time radar chart maps the emotional character of your progression across eight axes — Joy, Tension, Melancholy, Longing, and more. Watch it shift as you build.
           </p>
-          <img class="radar-image" src="screenshots/IMG_4755.PNG" alt="Emotional Fingerprint radar chart">
+          <img class="radar-image" src="/screenshots/IMG_4755.PNG" alt="Emotional Fingerprint radar chart">
         </div>
       </div>
     </section>
