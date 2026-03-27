@@ -573,29 +573,23 @@
     }
 
     .app-screen-frame {
+      aspect-ratio: 9 / 19;
       background: var(--surface);
       border: none;
       border-radius: 36px;
       box-shadow: var(--shadow-soft), var(--glass-border);
+      min-height: 1px;
       overflow: hidden;
       position: relative;
       width: 280px;
     }
 
-    .app-screen-frame::before {
-      content: '';
-      display: block;
-      padding-bottom: calc(100% * 19 / 9);
-      width: 100%;
-    }
-
     .app-screen-frame video {
-      height: 110%;
-      left: 0;
-      object-fit: cover;
-      position: absolute;
-      top: -5%;
       width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: inherit;
     }
 
     .screenshot-pair {
