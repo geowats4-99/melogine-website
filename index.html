@@ -548,18 +548,12 @@
       max-width: 560px;
     }
 
-    /* Phone frame: CSS Grid gives the <video> a real cell size (abs+percent height was unreliable). */
     .hero-mockup {
       aspect-ratio: 9 / 19;
       background: linear-gradient(180deg, var(--surface) 0%, rgba(42,39,35,0.4) 100%);
-      border: none;
       border-radius: 36px;
       box-shadow: var(--shadow-soft), var(--glass-border);
-      display: grid;
       flex-shrink: 0;
-      grid-template: 1fr / 1fr;
-      margin: 0;
-      max-width: 280px;
       overflow: hidden;
       position: relative;
       width: min(280px, 100%);
@@ -567,44 +561,31 @@
     }
 
     .hero-mockup video {
-      -webkit-clip-path: inset(var(--screen-recording-crop-top) 0 0 0);
-      clip-path: inset(var(--screen-recording-crop-top) 0 0 0);
-      display: block;
-      grid-area: 1 / 1;
-      height: 100%;
-      min-height: 0;
-      min-width: 0;
+      height: calc(100% + var(--screen-recording-crop-top) * 2);
+      left: 0;
       object-fit: cover;
-      object-position: center top;
+      position: absolute;
+      top: calc(var(--screen-recording-crop-top) * -2);
       width: 100%;
     }
 
     .app-screen-frame {
       aspect-ratio: 9 / 19;
       background: var(--surface);
-      border: none;
       border-radius: 36px;
       box-shadow: var(--shadow-soft), var(--glass-border);
-      display: grid;
-      flex: 0 0 auto;
-      grid-template: 1fr / 1fr;
-      max-width: 100%;
-      min-width: 0;
+      flex-shrink: 0;
       overflow: hidden;
       position: relative;
       width: 280px;
     }
 
     .app-screen-frame video {
-      -webkit-clip-path: inset(var(--screen-recording-crop-top) 0 0 0);
-      clip-path: inset(var(--screen-recording-crop-top) 0 0 0);
-      display: block;
-      grid-area: 1 / 1;
-      height: 100%;
-      min-height: 0;
-      min-width: 0;
+      height: calc(100% + var(--screen-recording-crop-top) * 2);
+      left: 0;
       object-fit: cover;
-      object-position: center top;
+      position: absolute;
+      top: calc(var(--screen-recording-crop-top) * -2);
       width: 100%;
     }
 
