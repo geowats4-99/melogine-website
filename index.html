@@ -364,7 +364,7 @@
       position: relative;
     }
     
-    /* Glow behind the mockup */
+    /* Glow behind the mockup (stay under video) */
     .hero__media-block::before {
       content: "";
       position: absolute;
@@ -375,6 +375,7 @@
       background: radial-gradient(circle at center, rgba(232, 160, 32, 0.15) 0%, transparent 70%);
       transform: translate(-50%, -50%);
       pointer-events: none;
+      z-index: 0;
       z-index: -1;
     }
 
@@ -547,30 +548,35 @@
       max-width: 560px;
     }
 
-    /* Phone frame: explicit aspect-ratio + in-flow box size; video layered above (z-index) */
+    /* Phone frame: CSS Grid gives the <video> a real cell size (abs+percent height was unreliable). */
     .hero-mockup {
       aspect-ratio: 9 / 19;
       background: linear-gradient(180deg, var(--surface) 0%, rgba(42,39,35,0.4) 100%);
       border: none;
       border-radius: 36px;
       box-shadow: var(--shadow-soft), var(--glass-border);
+      display: grid;
       flex-shrink: 0;
+      grid-template: 1fr / 1fr;
       margin: 0;
       max-width: 280px;
       overflow: hidden;
       position: relative;
       width: min(280px, 100%);
+      z-index: 1;
     }
 
     .hero-mockup video {
-      height: calc(100% + var(--screen-recording-crop-top));
-      left: 0;
+      -webkit-clip-path: inset(var(--screen-recording-crop-top) 0 0 0);
+      clip-path: inset(var(--screen-recording-crop-top) 0 0 0);
+      display: block;
+      grid-area: 1 / 1;
+      height: 100%;
+      min-height: 0;
+      min-width: 0;
       object-fit: cover;
       object-position: center top;
-      position: absolute;
-      top: calc(0% - var(--screen-recording-crop-top));
       width: 100%;
-      z-index: 1;
     }
 
     .app-screen-frame {
@@ -579,7 +585,9 @@
       border: none;
       border-radius: 36px;
       box-shadow: var(--shadow-soft), var(--glass-border);
+      display: grid;
       flex: 0 0 auto;
+      grid-template: 1fr / 1fr;
       max-width: 100%;
       min-width: 0;
       overflow: hidden;
@@ -588,14 +596,16 @@
     }
 
     .app-screen-frame video {
-      height: calc(100% + var(--screen-recording-crop-top));
-      left: 0;
+      -webkit-clip-path: inset(var(--screen-recording-crop-top) 0 0 0);
+      clip-path: inset(var(--screen-recording-crop-top) 0 0 0);
+      display: block;
+      grid-area: 1 / 1;
+      height: 100%;
+      min-height: 0;
+      min-width: 0;
       object-fit: cover;
       object-position: center top;
-      position: absolute;
-      top: calc(0% - var(--screen-recording-crop-top));
       width: 100%;
-      z-index: 1;
     }
 
     .screenshot-pair {
@@ -1231,6 +1241,16 @@ when Melogine launches.</h2>
       </div>
     </div>
   </footer>
+  <script>
+    (function () {
+      document.querySelectorAll('.hero-mockup video, .app-screen-frame video').forEach(function (v) {
+        v.muted = true;
+        v.defaultMuted = true;
+        var p = v.play();
+        if (p && typeof p.then === 'function') p.catch(function () {});
+      });
+    })();
+  </script>
   <script>
     (function () {
       var canvas = document.getElementById('heroWaveCanvas');
