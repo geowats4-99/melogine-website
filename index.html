@@ -211,6 +211,12 @@
       background: rgba(255, 255, 255, 0.05);
     }
 
+    .button--app-store-disabled {
+      cursor: default;
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
     .site-nav {
       background: rgba(28, 26, 23, 0.95);
       backdrop-filter: blur(18px);
@@ -957,7 +963,7 @@
     <div class="container site-nav__inner">
       <a class="wordmark" href="#top">Melogine</a>
       <div class="nav-actions">
-        <a class="button button-secondary" href="#">Download on the App Store</a>
+        <a class="button button-secondary button--app-store-disabled" href="#">Download on the App Store</a>
         <a class="button button-primary" href="#early-access">Get Early Access</a>
       </div>
     </div>
@@ -994,7 +1000,7 @@ who learn by doing.</h1>
               </p>
               <div class="hero__actions">
                 <a class="button button-primary" href="#early-access">Get Early Access</a>
-                <a class="button button-secondary" href="#">Download on the App Store</a>
+                <a class="button button-secondary button--app-store-disabled" href="#">Download on the App Store</a>
               </div>
             </div>
             <div class="hero__media-block">
@@ -1193,14 +1199,12 @@ you finish the chord.</h2>
 
     <section class="section section-alt cta" id="early-access">
       <div class="container">
-        <h2 class="cta__title">Be the first to know
-when Melogine launches.</h2>
         <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script>
         <iframe src="https://subscribe-forms.beehiiv.com/7e2190dd-c989-449d-ba1c-e93371906c87" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 560px; height: 291px; margin: 0; border-radius: 0px 0px 0px 0px !important; background-color: transparent; box-shadow: 0 0 #0000; max-width: 100%;"></iframe>
         <p class="cta-note">No spam. Just a launch notification when Melogine hits the App Store.</p>
         <div class="cta-store">
           <!-- REPLACE WITH APP STORE URL -->
-          <a class="button button-secondary" href="#">Download on the App Store &rarr;</a>
+          <a class="button button-secondary button--app-store-disabled" href="#">Download on the App Store &rarr;</a>
         </div>
       </div>
     </section>
