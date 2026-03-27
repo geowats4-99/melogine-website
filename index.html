@@ -88,6 +88,26 @@
       text-rendering: optimizeLegibility;
     }
 
+    .cursor-trail-canvas {
+      height: 100%;
+      left: 0;
+      pointer-events: none;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 0;
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+    }
+
+    .site-footer {
+      position: relative;
+      z-index: 1;
+    }
+
     img {
       display: block;
       max-width: 100%;
@@ -958,6 +978,7 @@
   </style>
 </head>
 <body>
+  <canvas id="cursorTrailCanvas" class="cursor-trail-canvas" aria-hidden="true"></canvas>
   <header class="site-nav">
     <div class="container site-nav__inner">
       <a class="wordmark" href="#top">Melogine</a>
@@ -1593,6 +1614,122 @@ you finish the chord.</h2>
         resize();
       });
       requestAnimationFrame(frame);
+    })();
+  </script>
+  <script>
+    (function () {
+      var canvas = document.getElementById('cursorTrailCanvas');
+      if (!canvas || !canvas.getContext) return;
+
+      var ctx = canvas.getContext('2d');
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var points = [];
+      var maxPoints = 96;
+      var ttlMs = 720;
+      var amp = 4;
+      var freq = 0.35;
+      var waveSamples = 10;
+      var rafId = 0;
+
+      function resize() {
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+        canvas.width = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+        canvas.style.width = w + 'px';
+        canvas.style.height = h + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function dist(ax, ay, bx, by) {
+        var dx = bx - ax;
+        var dy = by - ay;
+        return Math.sqrt(dx * dx + dy * dy);
+      }
+
+      function drawTrail(now) {
+        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+        if (points.length < 2) return;
+
+        var i;
+        for (i = 0; i < points.length - 1; i++) {
+          var p0 = points[i];
+          var p1 = points[i + 1];
+          var age = now - (p0.t + p1.t) * 0.5;
+          var fade = 1 - Math.min(1, age / ttlMs);
+          if (fade <= 0) continue;
+
+          var len = dist(p0.x, p0.y, p1.x, p1.y);
+          if (len < 0.5) continue;
+
+          var ux = (p1.x - p0.x) / len;
+          var uy = (p1.y - p0.y) / len;
+          var px = -uy;
+          var py = ux;
+
+          ctx.beginPath();
+          var s;
+          for (s = 0; s <= waveSamples; s++) {
+            var t = s / waveSamples;
+            var bx = p0.x + (p1.x - p0.x) * t;
+            var by = p0.y + (p1.y - p0.y) * t;
+            var along = len * t + p0.x * 0.01 + p0.y * 0.01;
+            var off = amp * Math.sin(freq * along + now * 0.002);
+            var ox = bx + px * off;
+            var oy = by + py * off;
+            if (s === 0) ctx.moveTo(ox, oy);
+            else ctx.lineTo(ox, oy);
+          }
+
+          ctx.strokeStyle = 'rgba(232, 160, 32, ' + (0.15 * fade) + ')';
+          ctx.lineWidth = 1.25;
+          ctx.lineCap = 'round';
+          ctx.lineJoin = 'round';
+          ctx.stroke();
+        }
+      }
+
+      function tick(now) {
+        rafId = 0;
+        now = now || performance.now();
+        while (points.length && now - points[0].t > ttlMs) {
+          points.shift();
+        }
+        drawTrail(now);
+        if (points.length) {
+          rafId = requestAnimationFrame(tick);
+        }
+      }
+
+      function schedule() {
+        if (!rafId) {
+          rafId = requestAnimationFrame(tick);
+        }
+      }
+
+      window.addEventListener('mousemove', function (e) {
+        if (e.pointerType && e.pointerType !== 'mouse') return;
+        var t = performance.now();
+        var x = e.clientX;
+        var y = e.clientY;
+        if (points.length) {
+          var last = points[points.length - 1];
+          if (dist(last.x, last.y, x, y) < 2) {
+            schedule();
+            return;
+          }
+        }
+        points.push({ x: x, y: y, t: t });
+        if (points.length > maxPoints) points.shift();
+        schedule();
+      }, { passive: true });
+
+      window.addEventListener('resize', function () {
+        resize();
+        schedule();
+      });
+
+      resize();
     })();
   </script>
 </body>
