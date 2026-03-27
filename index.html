@@ -3,7 +3,7 @@
   Deploy: Push to GitHub, connect repo to Netlify (netlify.com), set custom domain in Netlify settings.
   DNS: In GoDaddy, add a CNAME record pointing www to your Netlify subdomain, and an A record for @ to Netlify's load balancer IP.
   Mailchimp: Replace the form action URL with your Mailchimp embedded form action.
-  Feature demos: /media/*.mp4 (H.264, autoplay muted loop). Emotional Fingerprint: /screenshots/IMG_4755.PNG.
+  Screenshots: files in screenshots/ — replace <img> src values when assets change.
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -67,9 +67,6 @@
       --shadow-inner: inset 0 1px 0 rgba(255, 255, 255, 0.05);
       --glass-border: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
       --glass-bg: rgba(255, 255, 255, 0.02);
-
-      /* Hide iOS/macOS red recording bar: shift video up inside clipped frame */
-      --screen-recording-crop-top: 6%;
     }
 
     * {
@@ -364,7 +361,7 @@
       position: relative;
     }
     
-    /* Glow behind the mockup (stay under video) */
+    /* Glow behind the mockup */
     .hero__media-block::before {
       content: "";
       position: absolute;
@@ -375,7 +372,6 @@
       background: radial-gradient(circle at center, rgba(232, 160, 32, 0.15) 0%, transparent 70%);
       transform: translate(-50%, -50%);
       pointer-events: none;
-      z-index: 0;
       z-index: -1;
     }
 
@@ -496,10 +492,8 @@
     }
 
     .feature__media {
-      align-items: center;
       display: flex;
       justify-content: center;
-      min-height: 0;
     }
 
     .feature-tags {
@@ -548,68 +542,85 @@
       max-width: 560px;
     }
 
+    @keyframes fadeSwap {
+      0%, 45% { opacity: 1; }
+      50%, 95% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
     .hero-mockup {
       aspect-ratio: 9 / 19;
       background: linear-gradient(180deg, var(--surface) 0%, rgba(42,39,35,0.4) 100%);
+      border: none;
       border-radius: 36px;
       box-shadow: var(--shadow-soft), var(--glass-border);
-      flex-shrink: 0;
-      overflow: hidden;
-      position: relative;
-      width: min(280px, 100%);
-      z-index: 1;
-    }
-
-    .hero-mockup video {
-      height: calc(100% + var(--screen-recording-crop-top) * 2);
-      left: 0;
-      object-fit: cover;
-      position: absolute;
-      top: calc(var(--screen-recording-crop-top) * -2);
-      width: 100%;
-    }
-
-    .app-screen-frame {
-      aspect-ratio: 9 / 19;
-      background: var(--surface);
-      border-radius: 36px;
-      box-shadow: var(--shadow-soft), var(--glass-border);
-      flex-shrink: 0;
+      margin: 0;
       overflow: hidden;
       position: relative;
       width: 280px;
     }
 
-    .app-screen-frame video {
-      height: calc(100% + var(--screen-recording-crop-top) * 2);
-      left: 0;
+    .hero-mockup img {
+      height: 100%;
       object-fit: cover;
       position: absolute;
-      top: calc(var(--screen-recording-crop-top) * -2);
+      transition: opacity 0.8s ease;
       width: 100%;
     }
 
+    .hero-mockup img:nth-child(1) {
+      animation: fadeSwap 6s ease-in-out infinite;
+    }
+
+    .hero-mockup img:nth-child(2) {
+      animation: fadeSwap 6s ease-in-out infinite;
+      animation-delay: 3s;
+    }
+
     .screenshot-pair {
-      align-items: center;
       display: flex;
       gap: 16px;
       justify-content: center;
       margin-top: 0;
     }
 
-    .screenshot-pair--single .app-screen-frame {
-      width: min(280px, 100%);
+    .screenshot-pair img {
+      aspect-ratio: 9 / 19;
+      background: linear-gradient(180deg, var(--surface) 0%, rgba(42,39,35,0.4) 100%);
+      border: none;
+      border-radius: 36px;
+      box-shadow: var(--shadow-soft), var(--glass-border);
+      flex: 1 1 0;
+      min-width: 0;
+      object-fit: cover;
     }
 
-    .fundamentals-media {
-      align-items: center;
+    .screenshot-pair--single img {
+      flex: 0 1 280px;
+      max-width: 100%;
+    }
+
+    .fundamentals-scroll {
+      -ms-overflow-style: none;
       display: flex;
-      justify-content: center;
+      gap: 0;
       margin-top: 0;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
     }
 
-    .fundamentals-media .app-screen-frame {
-      width: min(280px, 100%);
+    .fundamentals-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .fundamentals-scroll img {
+      flex: 0 0 200px;
+      height: auto;
+      object-fit: cover;
+      scroll-snap-align: start;
+      width: 200px;
     }
 
     .radar-image {
@@ -993,8 +1004,9 @@ who learn by doing.</h1>
               </div>
             </div>
             <div class="hero__media-block">
-              <div class="hero-mockup" aria-label="Melogine Sandbox screen recording">
-                <video autoplay muted loop playsinline webkit-playsinline preload="auto" src="/media/sandbox.mp4" aria-label="Melogine Sandbox demo"></video>
+              <div class="hero-mockup" aria-label="Melogine app screenshots">
+                <img src="screenshots/IMG_4732.PNG" alt="Melogine Sandbox with Ghost Engine">
+                <img src="screenshots/IMG_4731.PNG" alt="Melogine Sandbox piano roll">
               </div>
               <p class="hero__footnote">Available on iOS 18.2 and above</p>
             </div>
@@ -1018,10 +1030,9 @@ You just don't know why yet.</h2>
     <section class="section">
       <div class="container feature">
         <div class="feature__media">
-          <div class="screenshot-pair screenshot-pair--single">
-            <div class="app-screen-frame">
-              <video autoplay muted loop playsinline webkit-playsinline preload="auto" src="/media/sandbox.mp4" aria-label="Melogine Sandbox demo"></video>
-            </div>
+          <div class="screenshot-pair">
+            <img src="screenshots/IMG_4732.PNG" alt="Melogine Sandbox with Ghost Engine">
+            <img src="screenshots/IMG_4731.PNG" alt="Melogine Sandbox piano roll">
           </div>
         </div>
         <div class="feature__copy">
@@ -1052,10 +1063,11 @@ in a DAW.</h2>
           </p>
         </div>
         <div class="feature__media">
-          <div class="fundamentals-media">
-            <div class="app-screen-frame">
-              <video autoplay muted loop playsinline webkit-playsinline preload="auto" src="/media/fundamentals.mp4" aria-label="Melogine Fundamentals demo"></video>
-            </div>
+          <div class="fundamentals-scroll">
+            <img src="screenshots/IMG_4730.PNG" alt="Melogine Fundamentals">
+            <img src="screenshots/IMG_4725.PNG" alt="Melogine Fundamentals intervals">
+            <img src="screenshots/IMG_4726.PNG" alt="Melogine Fundamentals scales">
+            <img src="screenshots/IMG_4728.PNG" alt="Melogine Fundamentals chord construction">
           </div>
         </div>
       </div>
@@ -1064,10 +1076,9 @@ in a DAW.</h2>
     <section class="section">
       <div class="container feature">
         <div class="feature__media">
-          <div class="screenshot-pair screenshot-pair--single">
-            <div class="app-screen-frame">
-              <video autoplay muted loop playsinline webkit-playsinline preload="auto" src="/media/challenges.mp4" aria-label="Melogine Challenges demo"></video>
-            </div>
+          <div class="screenshot-pair">
+            <img src="screenshots/IMG_4742.PNG" alt="Melogine Challenges">
+            <img src="screenshots/IMG_challenges_correct.PNG" alt="Melogine Challenges correct answer">
           </div>
         </div>
         <div class="feature__copy">
@@ -1085,9 +1096,7 @@ Build what you don't.</h2>
       <div class="container feature">
         <div class="feature__media">
           <div class="screenshot-pair screenshot-pair--single">
-            <div class="app-screen-frame">
-              <video autoplay muted loop playsinline webkit-playsinline preload="auto" src="/media/glossary.mp4" aria-label="Melogine Glossary demo"></video>
-            </div>
+            <img src="screenshots/IMG_4744.PNG" alt="Melogine Glossary">
           </div>
         </div>
         <div class="feature__copy">
@@ -1110,7 +1119,7 @@ you finish the chord.</h2>
           <p class="emotion__body">
             A real-time radar chart maps the emotional character of your progression across eight axes — Joy, Tension, Melancholy, Longing, and more. Watch it shift as you build.
           </p>
-          <img class="radar-image" src="/screenshots/IMG_4755.PNG" alt="Emotional Fingerprint radar chart">
+          <img class="radar-image" src="screenshots/IMG_4755.PNG" alt="Emotional Fingerprint radar chart">
         </div>
       </div>
     </section>
@@ -1222,16 +1231,6 @@ when Melogine launches.</h2>
       </div>
     </div>
   </footer>
-  <script>
-    (function () {
-      document.querySelectorAll('.hero-mockup video, .app-screen-frame video').forEach(function (v) {
-        v.muted = true;
-        v.defaultMuted = true;
-        var p = v.play();
-        if (p && typeof p.then === 'function') p.catch(function () {});
-      });
-    })();
-  </script>
   <script>
     (function () {
       var canvas = document.getElementById('heroWaveCanvas');
