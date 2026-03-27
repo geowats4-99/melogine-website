@@ -2,7 +2,7 @@
   MELOGINE LANDING PAGE
   Deploy: Push to GitHub, connect repo to Netlify (netlify.com), set custom domain in Netlify settings.
   DNS: In GoDaddy, add a CNAME record pointing www to your Netlify subdomain, and an A record for @ to Netlify's load balancer IP.
-  Mailchimp: Replace the form action URL with your Mailchimp embedded form action.
+  Newsletter: Beehiiv embed in early-access section.
   Feature demos: media/*.mp4 (H.264). Source recordings in Screenrecordings./ — re-run avconvert if you replace clips.
 -->
 <!DOCTYPE html>
@@ -1195,19 +1195,8 @@ you finish the chord.</h2>
       <div class="container">
         <h2 class="cta__title">Be the first to know
 when Melogine launches.</h2>
-        <!-- REPLACE ACTION URL WITH MAILCHIMP FORM ACTION -->
-        <form class="cta-form" action="#" method="post">
-          <label class="sr-only" for="email">Email address</label>
-          <input
-            class="cta-input"
-            id="email"
-            name="EMAIL"
-            type="email"
-            placeholder="Enter your email"
-            required
-          >
-          <button class="cta-submit" type="submit">Get Early Access</button>
-        </form>
+        <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script>
+        <iframe src="https://subscribe-forms.beehiiv.com/7e2190dd-c989-449d-ba1c-e93371906c87" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 560px; height: 291px; margin: 0; border-radius: 0px 0px 0px 0px !important; background-color: transparent; box-shadow: 0 0 #0000; max-width: 100%;"></iframe>
         <p class="cta-note">No spam. Just a launch notification when Melogine hits the App Store.</p>
         <div class="cta-store">
           <!-- REPLACE WITH APP STORE URL -->
