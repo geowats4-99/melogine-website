@@ -3,7 +3,7 @@
   Deploy: Push to GitHub, connect repo to Netlify (netlify.com), set custom domain in Netlify settings.
   DNS: In GoDaddy, add a CNAME record pointing www to your Netlify subdomain, and an A record for @ to Netlify's load balancer IP.
   Mailchimp: Replace the form action URL with your Mailchimp embedded form action.
-  Feature demos: /media/*.mp4|.mov (autoplay muted loop). Emotional Fingerprint: /screenshots/IMG_4755.PNG.
+  Feature demos: /media/*.mp4 (H.264, autoplay muted loop). Emotional Fingerprint: /screenshots/IMG_4755.PNG.
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -495,8 +495,10 @@
     }
 
     .feature__media {
+      align-items: center;
       display: flex;
       justify-content: center;
+      min-height: 0;
     }
 
     .feature-tags {
@@ -545,12 +547,14 @@
       max-width: 560px;
     }
 
-    /* ::before gives height: abs-positioned <video> alone collapses grid/flex rows to 0 in some browsers */
+    /* Phone frame: explicit aspect-ratio + in-flow box size; video layered above (z-index) */
     .hero-mockup {
+      aspect-ratio: 9 / 19;
       background: linear-gradient(180deg, var(--surface) 0%, rgba(42,39,35,0.4) 100%);
       border: none;
       border-radius: 36px;
       box-shadow: var(--shadow-soft), var(--glass-border);
+      flex-shrink: 0;
       margin: 0;
       max-width: 280px;
       overflow: hidden;
@@ -558,51 +562,44 @@
       width: min(280px, 100%);
     }
 
-    .hero-mockup::before {
-      content: '';
-      display: block;
-      padding-bottom: calc(100% * 19 / 9);
-      width: 100%;
-    }
-
     .hero-mockup video {
       height: calc(100% + var(--screen-recording-crop-top));
       left: 0;
       object-fit: cover;
+      object-position: center top;
       position: absolute;
       top: calc(0% - var(--screen-recording-crop-top));
       width: 100%;
+      z-index: 1;
     }
 
     .app-screen-frame {
+      aspect-ratio: 9 / 19;
       background: var(--surface);
       border: none;
       border-radius: 36px;
       box-shadow: var(--shadow-soft), var(--glass-border);
-      flex: 1 1 0;
+      flex: 0 0 auto;
+      max-width: 100%;
       min-width: 0;
       overflow: hidden;
       position: relative;
-      width: 100%;
-    }
-
-    .app-screen-frame::before {
-      content: '';
-      display: block;
-      padding-bottom: calc(100% * 19 / 9);
-      width: 100%;
+      width: 280px;
     }
 
     .app-screen-frame video {
       height: calc(100% + var(--screen-recording-crop-top));
       left: 0;
       object-fit: cover;
+      object-position: center top;
       position: absolute;
       top: calc(0% - var(--screen-recording-crop-top));
       width: 100%;
+      z-index: 1;
     }
 
     .screenshot-pair {
+      align-items: center;
       display: flex;
       gap: 16px;
       justify-content: center;
@@ -610,20 +607,17 @@
     }
 
     .screenshot-pair--single .app-screen-frame {
-      flex: 0 1 280px;
-      max-width: 100%;
       width: min(280px, 100%);
     }
 
     .fundamentals-media {
+      align-items: center;
       display: flex;
       justify-content: center;
       margin-top: 0;
     }
 
     .fundamentals-media .app-screen-frame {
-      flex: 0 1 auto;
-      max-width: 100%;
       width: min(280px, 100%);
     }
 
@@ -1009,7 +1003,7 @@ who learn by doing.</h1>
             </div>
             <div class="hero__media-block">
               <div class="hero-mockup" aria-label="Melogine Sandbox screen recording">
-                <video autoplay muted loop playsinline webkit-playsinline preload="auto" src="/media/sandbox.mov" aria-label="Melogine Sandbox demo"></video>
+                <video autoplay muted loop playsinline webkit-playsinline preload="auto" src="/media/sandbox.mp4" aria-label="Melogine Sandbox demo"></video>
               </div>
               <p class="hero__footnote">Available on iOS 18.2 and above</p>
             </div>
@@ -1035,7 +1029,7 @@ You just don't know why yet.</h2>
         <div class="feature__media">
           <div class="screenshot-pair screenshot-pair--single">
             <div class="app-screen-frame">
-              <video autoplay muted loop playsinline webkit-playsinline preload="auto" src="/media/sandbox.mov" aria-label="Melogine Sandbox demo"></video>
+              <video autoplay muted loop playsinline webkit-playsinline preload="auto" src="/media/sandbox.mp4" aria-label="Melogine Sandbox demo"></video>
             </div>
           </div>
         </div>
