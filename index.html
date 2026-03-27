@@ -67,6 +67,9 @@
       --shadow-inner: inset 0 1px 0 rgba(255, 255, 255, 0.05);
       --glass-border: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
       --glass-bg: rgba(255, 255, 255, 0.02);
+
+      /* Hide iOS/macOS red recording bar: shift video up inside clipped frame */
+      --screen-recording-crop-top: 6%;
     }
 
     * {
@@ -556,8 +559,32 @@
 
     .hero-mockup video {
       display: block;
-      height: 100%;
+      height: calc(100% + var(--screen-recording-crop-top));
+      left: 0;
       object-fit: cover;
+      position: absolute;
+      top: calc(0% - var(--screen-recording-crop-top));
+      width: 100%;
+    }
+
+    .app-screen-frame {
+      aspect-ratio: 9 / 19;
+      background: var(--surface);
+      border: none;
+      border-radius: 36px;
+      box-shadow: var(--shadow-soft), var(--glass-border);
+      flex: 1 1 0;
+      min-width: 0;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .app-screen-frame video {
+      height: calc(100% + var(--screen-recording-crop-top));
+      left: 0;
+      object-fit: cover;
+      position: absolute;
+      top: calc(0% - var(--screen-recording-crop-top));
       width: 100%;
     }
 
@@ -568,18 +595,7 @@
       margin-top: 0;
     }
 
-    .screenshot-pair video {
-      aspect-ratio: 9 / 19;
-      background: var(--surface);
-      border: none;
-      border-radius: 36px;
-      box-shadow: var(--shadow-soft), var(--glass-border);
-      flex: 1 1 0;
-      min-width: 0;
-      object-fit: cover;
-    }
-
-    .screenshot-pair--single video {
+    .screenshot-pair--single .app-screen-frame {
       flex: 0 1 280px;
       max-width: 100%;
     }
@@ -590,13 +606,8 @@
       margin-top: 0;
     }
 
-    .fundamentals-media video {
-      aspect-ratio: 9 / 19;
-      background: var(--surface);
-      border: none;
-      border-radius: 36px;
-      box-shadow: var(--shadow-soft), var(--glass-border);
-      object-fit: cover;
+    .fundamentals-media .app-screen-frame {
+      flex: 0 1 auto;
       width: min(280px, 100%);
     }
 
@@ -1007,7 +1018,9 @@ You just don't know why yet.</h2>
       <div class="container feature">
         <div class="feature__media">
           <div class="screenshot-pair screenshot-pair--single">
-            <video autoplay muted loop playsinline src="ScreenRecording_03-27-2026 15-30-00_1.mov" aria-label="Melogine Sandbox demo"></video>
+            <div class="app-screen-frame">
+              <video autoplay muted loop playsinline src="ScreenRecording_03-27-2026 15-30-00_1.mov" aria-label="Melogine Sandbox demo"></video>
+            </div>
           </div>
         </div>
         <div class="feature__copy">
@@ -1039,7 +1052,9 @@ in a DAW.</h2>
         </div>
         <div class="feature__media">
           <div class="fundamentals-media">
-            <video autoplay muted loop playsinline src="ScreenRecording_03-27-2026 15-34-51_1.MP4" aria-label="Melogine Fundamentals demo"></video>
+            <div class="app-screen-frame">
+              <video autoplay muted loop playsinline src="ScreenRecording_03-27-2026 15-34-51_1.MP4" aria-label="Melogine Fundamentals demo"></video>
+            </div>
           </div>
         </div>
       </div>
@@ -1049,7 +1064,9 @@ in a DAW.</h2>
       <div class="container feature">
         <div class="feature__media">
           <div class="screenshot-pair screenshot-pair--single">
-            <video autoplay muted loop playsinline src="ScreenRecording_03-27-2026 15-38-02_1.MP4" aria-label="Melogine Glossary demo"></video>
+            <div class="app-screen-frame">
+              <video autoplay muted loop playsinline src="ScreenRecording_03-27-2026 15-38-02_1.MP4" aria-label="Melogine Glossary demo"></video>
+            </div>
           </div>
         </div>
         <div class="feature__copy">
@@ -1067,7 +1084,9 @@ losing your flow.</h2>
       <div class="container feature">
         <div class="feature__media">
           <div class="screenshot-pair screenshot-pair--single">
-            <video autoplay muted loop playsinline src="ScreenRecording_03-27-2026 15-33-05_1.MP4" aria-label="Melogine Challenges demo"></video>
+            <div class="app-screen-frame">
+              <video autoplay muted loop playsinline src="ScreenRecording_03-27-2026 15-33-05_1.MP4" aria-label="Melogine Challenges demo"></video>
+            </div>
           </div>
         </div>
         <div class="feature__copy">
